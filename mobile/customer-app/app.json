@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "GoNaatu",
+    "slug": "gonaatu-customer",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2d6a2d"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#2d6a2d"
+      },
+      "package": "com.gonaatu.customer",
+      "permissions": [
+        "NOTIFICATIONS",
+        "VIBRATE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBuU_wrOTRDakq6oBPSj18thl15_dDkMak"
+        }
+      }
+    },
+    "plugins": [
+      "expo-notifications",
+      "expo-font"
+    ],
+    "scheme": "gonaatu",
+    "extra": {
+      "eas": {
+        "projectId": "ec31dc0c-bdc1-4510-80ea-6af67d818917"
+      }
+    }
+  }
+}

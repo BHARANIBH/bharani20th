@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Saved Addresses - Pure Desi Country Chicken</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2d6a2d">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GoNaatu">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/mobile.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f3f3;
+            color: #1a1a1a;
+            line-height: 1.5;
+        }
+
+        /* Header */
+        .header {
+            background-color: #fff;
+            padding: 14px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            flex: 1;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 0 0 108px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            margin: 20px 0;
+        }
+
+        .empty-illustration {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .empty-subtitle {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        /* Address Cards */
+        .address-card {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+
+        .address-card.selected {
+            border-color: #28a745;
+            box-shadow: 0 4px 16px rgba(40, 167, 69, 0.15);
+        }
+
+        .address-label {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .address-card.selected .address-label {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .address-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .address-details {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .address-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #007bff;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 0;
+            text-decoration: underline;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 0;
+            text-decoration: underline;
+        }
+
+        /* Add Address Screen */
+        .add-address-screen {
+            display: none;
+        }
+
+        .add-address-screen.active {
+            display: block;
+        }
+
+        /* Map Section */
+        .map-section {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-section::before {
+            content: '📍';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 64px;
+            opacity: 0.8;
+        }
+
+        .map-placeholder {
+            text-align: center;
+            z-index: 1;
+            position: relative;
+        }
+
+        .map-placeholder i {
+            font-size: 48px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .map-placeholder span {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Location Display */
+        .location-display {
+            background-color: #fff;
+            border-radius: 0;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            box-shadow: none;
+            border-top: 1px solid #ededed;
+            border-bottom: 1px solid #ededed;
+        }
+
+        .location-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .location-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .location-icon {
+            margin-top: 2px;
+            color: #222;
+            font-size: 18px;
+        }
+
+        .location-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .change-btn {
+            color: #b51c45;
+            font-size: 15px;
+            font-weight: 600;
+            background: #fff;
+            border: 1px solid #ececec;
+            border-radius: 10px;
+            min-width: 100px;
+            height: 42px;
+            cursor: pointer;
+            padding: 0 18px;
+        }
+
+        .location-address {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+            margin-top: 2px;
+        }
+
+        .map-picker {
+            background: #fff;
+            border-top: 1px solid #ededed;
+            border-bottom: 1px solid #ededed;
+            padding: 12px 16px 14px;
+            margin-bottom: 10px;
+        }
+
+        .map-search {
+            width: 100%;
+            border: 1px solid #d8d8d8;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .map-canvas {
+            width: 100%;
+            height: 180px;
+            border-radius: 12px;
+            border: 1px solid #e5e5e5;
+            background: #f5f5f5;
+        }
+
+        /* Form */
+        .address-form {
+            background-color: #fff;
+            border-radius: 0;
+            padding: 0 16px 12px;
+            margin-bottom: 20px;
+            box-shadow: none;
+            border: none;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 15px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #d8d8d8;
+            border-radius: 14px;
+            font-size: 16px;
+            font-family: inherit;
+            background-color: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        .form-input.optional::placeholder {
+            color: #adb5bd;
+        }
+
+        /* Address Labels */
+        .address-labels {
+            margin-bottom: 18px;
+        }
+
+        .labels-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .label-chips {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 8px;
+        }
+
+        .label-chip {
+            padding: 10px 14px;
+            border: 1px solid #dcdcdc;
+            border-radius: 10px;
+            background-color: #fff;
+            color: #232323;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 40px;
+            min-width: 90px;
+        }
+
+        .label-chip:hover {
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .label-chip.selected {
+            background-color: #101010;
+            border-color: #101010;
+            color: white;
+        }
+
+        .label-chip.selected:hover {
+            background-color: #101010;
+            border-color: #101010;
+        }
+
+        .house-type-group {
+            margin-bottom: 18px;
+        }
+
+        .house-type-chips .label-chip {
+            min-width: 120px;
+            flex: 1;
+        }
+
+        /* Save As Input */
+        .save-as-group {
+            margin-bottom: 24px;
+        }
+
+        /* Fixed Bottom Button */
+        .bottom-button {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 16px 14px;
+            background-color: #fff;
+            border-top: 1px solid #f0f0f0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 50;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            display: block;
+        }
+
+        .btn-primary {
+            background-color: #E53935;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #d32f2f;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background-color: #d9114f;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #be0d44;
+            transform: translateY(-1px);
+        }
+
+        .required {
+            color: #d9114f;
+            margin-left: 2px;
+        }
+
+        .btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .header {
+                padding: 12px 14px;
+            }
+
+            .main-content {
+                padding-bottom: 102px;
+            }
+
+            .empty-state {
+                padding: 40px 20px;
+            }
+
+            .map-section {
+                height: 160px;
+            }
+
+            .bottom-button {
+                padding: 10px 12px 14px;
+            }
+
+            .btn {
+                padding: 15px;
+                font-size: 15px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .address-card, .empty-state, .address-form {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Saved Addresses Screen -->
+    <div id="savedAddressesScreen" class="screen">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="header-title">Saved Addresses</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Loading State -->
+            <div id="loadingState" class="loading" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading addresses...</p>
+            </div>
+
+            <!-- Addresses Container -->
+            <div id="addressesContainer">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Fixed Bottom Button -->
+        <div class="bottom-button">
+            <button class="btn btn-primary" onclick="showAddAddressScreen()">
+                <i class="fas fa-plus"></i> Add new address
+            </button>
+        </div>
+    </div>
+
+    <!-- Add Address Screen -->
+    <div id="addAddressScreen" class="screen add-address-screen">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" onclick="showSavedAddressesScreen()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="header-title">Address Details</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="map-picker">
+                <input id="placeSearchInput" class="map-search" type="text" placeholder="Search location, area, landmark">
+                <div id="addressMap" class="map-canvas"></div>
+            </div>
+
+            <!-- Location Display -->
+            <div class="location-display">
+                <div class="location-header">
+                    <div class="location-left">
+                        <i class="fas fa-building location-icon"></i>
+                        <div>
+                            <div class="location-title" id="selectedLocationTitle">Electronic City</div>
+                            <div class="location-address" id="selectedLocationAddress">Bengaluru, Bhovi Palya</div>
+                        </div>
+                    </div>
+                    <button class="change-btn" type="button" onclick="focusPlaceSearch()">Change</button>
+                </div>
+            </div>
+
+            <!-- Address Form -->
+            <form class="address-form" id="addressForm">
+                <div class="form-group">
+                    <label class="form-label">Address Details<span class="required">*</span></label>
+                    <div class="label-chips house-type-chips">
+                        <div class="label-chip selected house-type-chip" data-house-type="Individual House"><i class="fas fa-house"></i> Individual House</div>
+                        <div class="label-chip house-type-chip" data-house-type="Apartment"><i class="fas fa-building"></i> Apartment</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">House Number/Name/Area<span class="required">*</span></label>
+                    <input type="text" class="form-input" id="houseNo" placeholder="Enter your house number/name/area" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Floor</label>
+                    <input type="text" class="form-input optional" id="floor" placeholder="Enter your floor">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Landmark</label>
+                    <input type="text" class="form-input optional" id="landmark" placeholder="Enter your landmark">
+                </div>
+
+                <!-- Address Labels -->
+                <div class="address-labels">
+                    <div class="labels-title">Save as<span class="required">*</span></div>
+                    <div class="label-chips">
+                        <div class="label-chip selected" data-label="Home"><i class="fas fa-building"></i> Home</div>
+                        <div class="label-chip" data-label="Work"><i class="fas fa-house"></i> Work</div>
+                        <div class="label-chip" data-label="Other">Other</div>
+                    </div>
+                </div>
+
+                <div class="form-group save-as-group" style="display:none;">
+                    <label class="form-label">Save as custom</label>
+                    <input type="text" class="form-input" id="saveAs" placeholder="Enter label">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Receiver's Phone Number</label>
+                    <input type="tel" class="form-input" id="receiverPhone" placeholder="Enter receiver phone number">
+                </div>
+            </form>
+        </div>
+
+        <!-- Fixed Bottom Button -->
+        <div class="bottom-button">
+            <button class="btn btn-success" onclick="saveAddress()">
+                Save Address Details
+            </button>
+        </div>
+    </div>
+
+    <script src="js/addresses-page.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .catch(err => console.error('SW error:', err));
+            });
+        }
+    </script>
+</body>
+</html>

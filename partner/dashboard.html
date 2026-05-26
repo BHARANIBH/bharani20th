@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Partner Dashboard – GoNaatu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--green:#2d6a2d;--dark:#1a3a1a;--orange:#ff6b00;--blue:#1565c0;--red:#e53935;--gold:#f5a623}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f0;min-height:100vh;color:#1a1a1a}
+
+    /* ── Header ── */
+    .header{background:linear-gradient(135deg,var(--dark),var(--green));color:#fff;padding:14px 20px;position:sticky;top:0;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+    .header-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand-icon{width:38px;height:38px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+    .brand-name{font-size:1rem;font-weight:800;line-height:1.2}
+    .brand-sub{font-size:.7rem;opacity:.7;margin-top:1px}
+    .header-right{display:flex;align-items:center;gap:10px}
+    .status-wrap{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);padding:6px 12px;border-radius:20px;cursor:pointer}
+    .status-dot{width:8px;height:8px;border-radius:50%;background:#4caf50;animation:blink 1.5s infinite}
+    .status-dot.off{background:#9e9e9e;animation:none}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .status-label{font-size:.75rem;font-weight:700}
+    .logout-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:6px 14px;border-radius:8px;font-size:.75rem;cursor:pointer;font-weight:600}
+    .logout-btn:hover{background:rgba(255,255,255,.25)}
+
+    /* ── New order alert banner ── */
+    .new-order-alert{display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:300;background:var(--orange);color:#fff;padding:12px 24px;border-radius:30px;font-weight:700;font-size:.9rem;box-shadow:0 8px 24px rgba(255,107,0,.4);animation:slideDown .4s ease}
+    .new-order-alert.show{display:flex;align-items:center;gap:8px}
+    @keyframes slideDown{from{top:50px;opacity:0}to{top:70px;opacity:1}}
+
+    /* ── Main ── */
+    .main{max-width:680px;margin:0 auto;padding:16px;padding-bottom:90px}
+
+    /* ── Stats ── */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+    .stat-card{background:#fff;border-radius:14px;padding:14px 10px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);position:relative;overflow:hidden}
+    .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+    .stat-card.s-pending::before{background:var(--orange)}
+    .stat-card.s-preparing::before{background:var(--blue)}
+    .stat-card.s-ready::before{background:var(--green)}
+    .stat-card.s-revenue::before{background:var(--gold)}
+    .stat-val{font-size:1.6rem;font-weight:900;color:#1a1a1a;line-height:1}
+    .stat-lbl{font-size:.68rem;color:#888;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+
+    /* ── Section ── */
+    .section{margin-bottom:24px}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .section-title{font-size:.95rem;font-weight:800;color:#1a1a1a;display:flex;align-items:center;gap:8px}
+    .section-badge{background:var(--orange);color:#fff;font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:10px;min-width:20px;text-align:center}
+    .section-badge.green{background:var(--green)}
+    .section-badge.blue{background:var(--blue)}
+
+    /* ── Order card ── */
+    .order-card{background:#fff;border-radius:18px;padding:0;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.08);overflow:hidden;transition:transform .2s;border:1.5px solid transparent}
+    .order-card:hover{transform:translateY(-2px)}
+    .order-card.new-order{border-color:var(--orange);animation:pulse-border 1s ease 3}
+    @keyframes pulse-border{0%,100%{border-color:var(--orange)}50%{border-color:transparent}}
+    .card-top{padding:14px 16px;border-bottom:1px solid #f5f5f5}
+    .card-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .order-id{font-size:.95rem;font-weight:800;color:#1a1a1a}
+    .order-time{font-size:.72rem;color:#999}
+    .status-pill{padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+    .pill-pending{background:#fff3e0;color:#e65100}
+    .pill-confirmed{background:#e8f5e9;color:#2e7d32}
+    .pill-processing{background:#e3f2fd;color:#1565c0}
+    .pill-out_for_delivery{background:#f3e5f5;color:#6a1b9a}
+    .pill-cancelled{background:#ffebee;color:#c62828}
+    .customer-row{display:flex;align-items:center;gap:6px;font-size:.82rem;color:#444;margin-bottom:4px}
+    .customer-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--green),#4caf50);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;font-weight:800;flex-shrink:0}
+    .customer-info{flex:1}
+    .customer-name{font-weight:700;color:#1a1a1a;font-size:.85rem}
+    .customer-phone{font-size:.75rem;color:#666}
+    .card-body{padding:12px 16px;border-bottom:1px solid #f5f5f5}
+    .items-list{margin-bottom:8px}
+    .item-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #f0f0f0}
+    .item-row:last-child{border-bottom:none}
+    .item-name{font-size:.82rem;color:#333;font-weight:600}
+    .item-qty{font-size:.78rem;color:#666;background:#f5f5f5;padding:2px 8px;border-radius:10px}
+    .item-price{font-size:.82rem;color:var(--green);font-weight:700}
+    .order-meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+    .address-row{display:flex;align-items:flex-start;gap:6px;flex:1}
+    .address-text{font-size:.75rem;color:#666;line-height:1.4}
+    .amount-wrap{text-align:right;flex-shrink:0}
+    .amount-val{font-size:1.1rem;font-weight:900;color:var(--green)}
+    .payment-badge{font-size:.65rem;color:#888;font-weight:700;margin-top:1px}
+    .card-actions{padding:12px 16px;display:flex;gap:8px;background:#fafafa}
+    .action-btn{flex:1;padding:11px 8px;border:none;border-radius:12px;font-size:.82rem;font-weight:800;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+    .action-btn:active{transform:scale(.96)}
+    .btn-accept{background:var(--green);color:#fff;box-shadow:0 4px 12px rgba(45,106,45,.3)}
+    .btn-decline{background:#fff;color:var(--red);border:1.5px solid #ffcdd2}
+    .btn-prepare{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(21,101,192,.3)}
+    .btn-ready{background:var(--gold);color:#fff;box-shadow:0 4px 12px rgba(245,166,35,.3)}
+    .btn-loading{opacity:.6;pointer-events:none}
+
+    /* ── Timer chip ── */
+    .timer-chip{display:inline-flex;align-items:center;gap:4px;background:#fff3e0;color:#e65100;font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:10px}
+
+    /* ── Empty ── */
+    .empty{text-align:center;padding:32px 20px;color:#bbb}
+    .empty-icon{font-size:2.5rem;margin-bottom:10px}
+    .empty-text{font-size:.9rem;font-weight:600}
+    .empty-sub{font-size:.78rem;margin-top:4px}
+
+    /* ── Nav ── */
+    .nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-around;padding:10px 0 16px;z-index:100;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+    .nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#bbb;font-size:.65rem;font-weight:700;transition:color .2s}
+    .nav a.active{color:var(--green)}
+    .nav a i{font-size:1.25rem}
+    .nav-badge{position:absolute;top:-4px;right:-6px;background:var(--orange);color:#fff;font-size:.55rem;font-weight:800;padding:1px 5px;border-radius:8px;min-width:16px;text-align:center}
+    .nav-item{position:relative}
+
+    /* ── Pulse ring for new order ── */
+    @keyframes ring{0%{transform:scale(1);opacity:1}100%{transform:scale(1.8);opacity:0}}
+    .ring{animation:ring .8s ease-out infinite}
+  </style>
+</head>
+<body>
+
+<!-- New order alert -->
+<div class="new-order-alert" id="newOrderAlert">
+  <i class="fas fa-bell ring"></i> New Order Received!
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">🏪</div>
+      <div>
+        <div class="brand-name" id="restaurantName">Loading...</div>
+        <div class="brand-sub">GoNaatu Partner</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="status-wrap" onclick="toggleStatus()" id="statusWrap">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="status-label" id="statusLabel">Open</span>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card s-pending">
+      <div class="stat-val" id="statPending">-</div>
+      <div class="stat-lbl">Pending</div>
+    </div>
+    <div class="stat-card s-preparing">
+      <div class="stat-val" id="statPreparing">-</div>
+      <div class="stat-lbl">Preparing</div>
+    </div>
+    <div class="stat-card s-ready">
+      <div class="stat-val" id="statReady">-</div>
+      <div class="stat-lbl">Ready</div>
+    </div>
+    <div class="stat-card s-revenue">
+      <div class="stat-val" id="statRevenue">-</div>
+      <div class="stat-lbl">Revenue</div>
+    </div>
+  </div>
+
+  <!-- New / Pending Orders -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">
+        <i class="fas fa-bell" style="color:var(--orange)"></i> New Orders
+        <span class="section-badge" id="pendingCount">0</span>
+      </div>
+    </div>
+    <div id="pendingOrders">
+      <div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No new orders</div><div class="empty-sub">New orders will appear here in real-time</div></div>
+    </div>
+  </div>
+
+  <!-- Preparing -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">
+        <i class="fas fa-fire" style="color:var(--blue)"></i> Preparing
+        <span class="section-badge blue" id="preparingCount">0</span>
+      </div>
+    </div>
+    <div id="preparingOrders">
+      <div class="empty"><div class="empty-icon">🍗</div><div class="empty-text">Nothing being prepared</div></div>
+    </div>
+  </div>
+
+  <!-- Ready for Pickup -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">
+        <i class="fas fa-box-open" style="color:var(--green)"></i> Ready for Pickup
+        <span class="section-badge green" id="readyCount">0</span>
+      </div>
+    </div>
+    <div id="readyOrders">
+      <div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Nothing ready yet</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="nav">
+  <a href="/partner/dashboard.html" class="active">
+    <div class="nav-item">
+      <i class="fas fa-home"></i>
+      <div class="nav-badge" id="navBadge" style="display:none">0</div>
+    </div>
+    Dashboard
+  </a>
+  <a href="/partner/orders.html"><i class="fas fa-list-alt"></i>All Orders</a>
+  <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i>Logout</a>
+</div>
+
+<script>
+  const token = localStorage.getItem('partnerToken');
+  if (!token) window.location.href = '/partner/login.html';
+  const partner = JSON.parse(localStorage.getItem('partnerInfo') || '{}');
+  document.getElementById('restaurantName').textContent = partner.restaurantName || 'My Restaurant';
+  const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+
+  let allOrders = [];
+  let isOpen = true;
+
+  // ── Socket.IO real-time ──────────────────────────────────────
+  const socket = io();
+  socket.emit('join', { room: 'partners' });
+
+  socket.on('order:new', (order) => {
+    showNewOrderAlert();
+    playBeep();
+    loadOrders();
+  });
+
+  socket.on('order:updated', ({ orderId, status }) => {
+    loadOrders();
+  });
+
+  function showNewOrderAlert() {
+    const el = document.getElementById('newOrderAlert');
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
+  function playBeep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [880, 1100, 880].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = freq;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.18);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.15);
+        osc.start(ctx.currentTime + i * 0.18);
+        osc.stop(ctx.currentTime + i * 0.18 + 0.15);
+      });
+    } catch {}
+  }
+
+  // ── Data loading ─────────────────────────────────────────────
+  async function loadStats() {
+    try {
+      const res = await fetch('/api/partner/stats', { headers });
+      const d = await res.json();
+      if (d.success) {
+        document.getElementById('statPending').textContent  = d.stats.pendingOrders ?? d.stats.pending ?? 0;
+        document.getElementById('statPreparing').textContent = d.stats.preparing ?? 0;
+        document.getElementById('statReady').textContent   = d.stats.ready ?? 0;
+        document.getElementById('statRevenue').textContent  = '₹' + ((d.stats.revenue || 0).toLocaleString('en-IN'));
+      }
+    } catch {}
+  }
+
+  async function loadOrders() {
+    try {
+      const res = await fetch('/api/partner/orders', { headers });
+      const d = await res.json();
+      if (!d.success) return;
+      allOrders = d.orders || [];
+
+      const pending    = allOrders.filter(o => o.orderStatus === 'pending');
+      const preparing  = allOrders.filter(o => ['confirmed','processing'].includes(o.orderStatus));
+      const ready      = allOrders.filter(o => o.orderStatus === 'out_for_delivery');
+
+      document.getElementById('pendingCount').textContent   = pending.length;
+      document.getElementById('preparingCount').textContent = preparing.length;
+      document.getElementById('readyCount').textContent     = ready.length;
+
+      // Nav badge
+      const navBadge = document.getElementById('navBadge');
+      if (pending.length > 0) { navBadge.style.display = 'block'; navBadge.textContent = pending.length; }
+      else { navBadge.style.display = 'none'; }
+
+      renderOrders('pendingOrders',  pending,   'pending');
+      renderOrders('preparingOrders', preparing, 'preparing');
+      renderOrders('readyOrders',    ready,     'ready');
+
+      loadStats();
+    } catch(e) { console.error(e); }
+  }
+
+  function timeAgo(dateStr) {
+    const diff = Math.floor((Date.now() - new Date(dateStr)) / 60000);
+    if (diff < 1) return 'Just now';
+    if (diff < 60) return diff + ' min ago';
+    return Math.floor(diff/60) + ' hr ago';
+  }
+
+  function initials(name) {
+    return (name || 'C').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  }
+
+  function renderOrders(containerId, orders, section) {
+    const container = document.getElementById(containerId);
+    if (!orders.length) {
+      const emptyMap = {
+        pending:   ['📭','No new orders','New orders will appear here in real-time'],
+        preparing: ['🍗','Nothing being prepared','Accept orders to start preparing'],
+        ready:     ['📦','Nothing ready yet','Orders will appear here when ready'],
+      };
+      const [icon, text, sub] = emptyMap[section] || ['📭','No orders',''];
+      container.innerHTML = `<div class="empty"><div class="empty-icon">${icon}</div><div class="empty-text">${text}</div><div class="empty-sub">${sub}</div></div>`;
+      return;
+    }
+    container.innerHTML = orders.map(o => {
+      const items = (o.products || o.items || []).map(p => `
+        <div class="item-row">
+          <span class="item-name">${p.name || p.productName || ''}</span>
+          <span class="item-qty">×${p.quantity || p.qty || 1}</span>
+          <span class="item-price">₹${p.total || (p.price * (p.quantity || p.qty || 1)) || ''}</span>
+        </div>`).join('');
+
+      const actions = {
+        pending: `
+          <button class="action-btn btn-accept" onclick="updateOrder('${o.orderId}','confirmed',this)">
+            <i class="fas fa-check"></i> Accept
+          </button>
+          <button class="action-btn btn-decline" onclick="updateOrder('${o.orderId}','cancelled',this)">
+            <i class="fas fa-times"></i> Decline
+          </button>`,
+        confirmed: `
+          <button class="action-btn btn-prepare" onclick="updateOrder('${o.orderId}','processing',this)" style="width:100%">
+            <i class="fas fa-fire"></i> Start Preparing
+          </button>`,
+        processing: `
+          <button class="action-btn btn-ready" onclick="updateOrder('${o.orderId}','out_for_delivery',this)" style="width:100%">
+            <i class="fas fa-box"></i> Mark Ready for Pickup
+          </button>`,
+        out_for_delivery: `<div style="text-align:center;font-size:.8rem;color:#6a1b9a;font-weight:700;padding:4px 0">🛵 Delivery Agent Picked Up</div>`,
+      };
+
+      return `
+        <div class="order-card ${section==='pending'?'new-order':''}" id="card-${o.orderId}">
+          <div class="card-top">
+            <div class="card-top-row">
+              <div>
+                <div class="order-id">#${o.orderId}</div>
+                <div class="order-time">${timeAgo(o.createdAt)}</div>
+              </div>
+              <span class="status-pill pill-${o.orderStatus}">${o.orderStatus.replace(/_/g,' ')}</span>
+            </div>
+            <div class="customer-row">
+              <div class="customer-avatar">${initials(o.customerName)}</div>
+              <div class="customer-info">
+                <div class="customer-name">${o.customerName || 'Customer'}</div>
+                <div class="customer-phone">📞 ${o.phone || ''}</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="items-list">${items}</div>
+            <div class="order-meta">
+              <div class="address-row">
+                <i class="fas fa-map-marker-alt" style="color:var(--red);margin-top:2px;font-size:.8rem"></i>
+                <div class="address-text">${o.address || o.deliveryAddress || ''}</div>
+              </div>
+              <div class="amount-wrap">
+                <div class="amount-val">₹${o.totalPrice || o.grandTotal || o.total || ''}</div>
+                <div class="payment-badge">${(o.paymentMethod||'').toUpperCase()}</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-actions">${actions[o.orderStatus] || ''}</div>
+        </div>`;
+    }).join('');
+  }
+
+  async function updateOrder(orderId, status, btn) {
+    if (btn) { btn.classList.add('btn-loading'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
+    try {
+      const res = await fetch(`/api/partner/orders/${orderId}`, {
+        method: 'PUT', headers,
+        body: JSON.stringify({ orderStatus: status })
+      });
+      const d = await res.json();
+      if (d.success) {
+        loadOrders();
+      } else {
+        alert('Error: ' + (d.message || 'Failed to update'));
+        if (btn) { btn.classList.remove('btn-loading'); }
+      }
+    } catch(e) {
+      alert('Network error. Please try again.');
+      if (btn) { btn.classList.remove('btn-loading'); }
+    }
+  }
+
+  function toggleStatus() {
+    isOpen = !isOpen;
+    document.getElementById('statusDot').className = 'status-dot' + (isOpen ? '' : ' off');
+    document.getElementById('statusLabel').textContent = isOpen ? 'Open' : 'Closed';
+  }
+
+  function logout() {
+    socket.disconnect();
+    localStorage.removeItem('partnerToken');
+    localStorage.removeItem('partnerInfo');
+    window.location.href = '/partner/login.html';
+  }
+
+  // Initial load + auto-refresh every 20s
+  loadOrders();
+  setInterval(loadOrders, 20000);
+</script>
+</body>
+</html>

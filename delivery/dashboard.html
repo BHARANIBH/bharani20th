@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Delivery Dashboard – GoNaatu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--blue:#1a237e;--indigo:#3949ab;--green:#2e7d32;--red:#e53935;--gold:#ffd54f;--orange:#ff6b00}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:#eef0fb;min-height:100vh;color:#1a1a1a}
+
+    /* ── Header ── */
+    .header{background:linear-gradient(135deg,var(--blue),var(--indigo));color:#fff;padding:14px 20px;position:sticky;top:0;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+    .header-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+    .agent-info{display:flex;align-items:center;gap:10px}
+    .agent-avatar{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800}
+    .agent-name{font-size:1rem;font-weight:800}
+    .agent-vehicle{font-size:.72rem;opacity:.75;margin-top:1px}
+    .header-right{display:flex;align-items:center;gap:10px}
+    .avail-wrap{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);padding:7px 14px;border-radius:20px}
+    .avail-dot{width:8px;height:8px;border-radius:50%;background:#4caf50;animation:blink 1.5s infinite;flex-shrink:0}
+    .avail-dot.off{background:#9e9e9e;animation:none}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .toggle-switch{position:relative;width:44px;height:24px;cursor:pointer}
+    .toggle-switch input{opacity:0;width:0;height:0}
+    .slider{position:absolute;inset:0;background:#9e9e9e;border-radius:12px;transition:.3s}
+    .slider::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s}
+    input:checked + .slider{background:#4caf50}
+    input:checked + .slider::after{left:22px}
+    .avail-label{font-size:.75rem;font-weight:700}
+    .logout-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:6px 14px;border-radius:8px;font-size:.75rem;cursor:pointer;font-weight:600}
+
+    /* ── New order alert ── */
+    .new-alert{display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:300;background:var(--orange);color:#fff;padding:12px 24px;border-radius:30px;font-weight:700;font-size:.9rem;box-shadow:0 8px 24px rgba(255,107,0,.4);animation:slideDown .4s ease;white-space:nowrap}
+    .new-alert.show{display:flex;align-items:center;gap:8px}
+    @keyframes slideDown{from{top:50px;opacity:0}to{top:70px;opacity:1}}
+
+    /* ── Main ── */
+    .main{max-width:680px;margin:0 auto;padding:16px;padding-bottom:90px}
+
+    /* ── Status banner ── */
+    .status-banner{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:14px;margin-bottom:16px;font-weight:600;font-size:.88rem}
+    .status-banner.online{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+    .status-banner.offline{background:#fafafa;color:#757575;border:1px solid #e0e0e0}
+
+    /* ── Stats ── */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+    .stat-card{background:#fff;border-radius:14px;padding:14px 10px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+    .stat-val{font-size:1.6rem;font-weight:900;color:var(--blue)}
+    .stat-lbl{font-size:.68rem;color:#888;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+
+    /* ── Active delivery card ── */
+    .active-delivery{background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:20px;padding:20px;margin-bottom:20px;color:#fff;box-shadow:0 8px 28px rgba(26,35,126,.3)}
+    .active-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:800;letter-spacing:.5px;margin-bottom:14px}
+    .active-order-id{font-size:1.1rem;font-weight:900;margin-bottom:4px}
+    .active-row{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start}
+    .active-row i{margin-top:2px;opacity:.75;width:14px;flex-shrink:0}
+    .active-row-text{font-size:.85rem;line-height:1.4}
+    .active-row-text strong{font-weight:700;display:block}
+    .active-row-text span{opacity:.8;font-size:.8rem}
+    .active-amount{font-size:1.3rem;font-weight:900;margin:12px 0 4px}
+    .active-payment{font-size:.72rem;opacity:.7;font-weight:700;margin-bottom:16px}
+    .active-actions{display:flex;gap:10px}
+    .act-btn{flex:1;padding:12px;border:none;border-radius:13px;font-size:.85rem;font-weight:800;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+    .act-btn:active{transform:scale(.96)}
+    .btn-navigate{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)}
+    .btn-delivered{background:#4caf50;color:#fff;box-shadow:0 4px 12px rgba(76,175,80,.4)}
+
+    /* ── Section ── */
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .section-title{font-size:.95rem;font-weight:800;color:#1a1a1a;display:flex;align-items:center;gap:8px}
+    .count-badge{background:var(--indigo);color:#fff;font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:10px}
+
+    /* ── Order card ── */
+    .order-card{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.08);border-left:4px solid var(--indigo);transition:transform .15s}
+    .order-card:hover{transform:translateY(-2px)}
+    .card-head{padding:14px 16px;border-bottom:1px solid #f5f5f5;display:flex;justify-content:space-between;align-items:flex-start}
+    .order-id{font-size:.95rem;font-weight:800;color:var(--blue)}
+    .order-time{font-size:.72rem;color:#999;margin-top:2px}
+    .order-amount{font-size:1rem;font-weight:900;color:var(--blue);text-align:right}
+    .order-payment{font-size:.68rem;color:#999;text-align:right;margin-top:1px}
+    .card-body{padding:12px 16px}
+    .detail-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:.82rem;color:#444}
+    .detail-row i{color:var(--indigo);width:14px;margin-top:2px;flex-shrink:0}
+    .detail-row.red i{color:var(--red)}
+    .items-text{font-size:.78rem;color:#666;margin-bottom:10px}
+    .accept-btn{width:100%;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:13px;font-size:.88rem;font-weight:800;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+    .accept-btn:hover{background:var(--indigo)}
+    .accept-btn:active{transform:scale(.97)}
+    .accept-btn.loading{opacity:.6;pointer-events:none}
+
+    /* ── Empty ── */
+    .empty{text-align:center;padding:32px 20px;color:#bbb}
+    .empty-icon{font-size:2.5rem;margin-bottom:10px}
+    .empty-text{font-size:.9rem;font-weight:600}
+    .empty-sub{font-size:.78rem;margin-top:4px}
+
+    /* ── Nav ── */
+    .nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-around;padding:10px 0 16px;z-index:100;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+    .nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#bbb;font-size:.65rem;font-weight:700;transition:color .2s}
+    .nav a.active{color:var(--indigo)}
+    .nav a i{font-size:1.25rem}
+  </style>
+</head>
+<body>
+
+<div class="new-alert" id="newAlert">
+  <i class="fas fa-motorcycle"></i> New order ready for pickup!
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-inner">
+    <div class="agent-info">
+      <div class="agent-avatar">🚚</div>
+      <div>
+        <div class="agent-name" id="agentName">Loading...</div>
+        <div class="agent-vehicle" id="agentVehicle">Delivery Agent</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="avail-wrap">
+        <div class="avail-dot" id="availDot"></div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="availToggle" checked onchange="toggleAvailability()">
+          <span class="slider"></span>
+        </label>
+        <span class="avail-label" id="availLabel">Online</span>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Status banner -->
+  <div class="status-banner online" id="statusBanner">
+    <i class="fas fa-circle" style="font-size:.55rem"></i>
+    You are online and ready for deliveries
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-val" id="statDeliveries">0</div>
+      <div class="stat-lbl">Delivered</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="statAvailable">0</div>
+      <div class="stat-lbl">Available</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="statEarnings">₹0</div>
+      <div class="stat-lbl">Earnings</div>
+    </div>
+  </div>
+
+  <!-- Active Delivery -->
+  <div id="activeSection"></div>
+
+  <!-- Available Orders -->
+  <div class="section-head">
+    <div class="section-title">
+      <i class="fas fa-box-open" style="color:var(--indigo)"></i>
+      Ready for Pickup
+      <span class="count-badge" id="availCount">0</span>
+    </div>
+    <button onclick="loadOrders()" style="background:none;border:none;color:var(--indigo);font-size:.8rem;font-weight:700;cursor:pointer"><i class="fas fa-sync"></i> Refresh</button>
+  </div>
+  <div id="availableOrders">
+    <div class="empty"><div class="empty-icon">🏍️</div><div class="empty-text">No orders available</div><div class="empty-sub">Stay online to receive delivery requests</div></div>
+  </div>
+</div>
+
+<!-- Nav -->
+<div class="nav">
+  <a href="/delivery/dashboard.html" class="active"><i class="fas fa-home"></i>Dashboard</a>
+  <a href="#" onclick="loadOrders()"><i class="fas fa-sync-alt"></i>Refresh</a>
+  <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i>Logout</a>
+</div>
+
+<script>
+  const token = localStorage.getItem('deliveryToken');
+  if (!token) window.location.href = '/delivery/login.html';
+  const agentData = JSON.parse(localStorage.getItem('deliveryAgent') || '{}');
+  document.getElementById('agentName').textContent = agentData.name || 'Agent';
+  document.getElementById('agentVehicle').textContent = '🏍️ ' + (agentData.vehicleType || 'Bike');
+  const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+  let isAvailable = true;
+
+  // ── Socket.IO ────────────────────────────────────────────
+  const socket = io();
+  socket.emit('join', { room: 'delivery' });
+
+  socket.on('order:updated', ({ orderId, status }) => {
+    if (status === 'out_for_delivery') {
+      showAlert();
+    }
+    loadOrders();
+  });
+
+  function showAlert() {
+    const el = document.getElementById('newAlert');
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3500);
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 660; osc.type = 'sine';
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(); osc.stop(ctx.currentTime + 0.4);
+    } catch {}
+  }
+
+  // ── Load data ────────────────────────────────────────────
+  async function loadOrders() {
+    try {
+      const [ordRes, myRes] = await Promise.all([
+        fetch('/api/delivery/orders', { headers }).then(r => r.json()),
+        fetch('/api/delivery/my-order', { headers }).then(r => r.json()),
+      ]);
+
+      const available = (ordRes.orders || []).filter(o => o.orderStatus === 'out_for_delivery');
+      const myOrder   = myRes.order;
+
+      document.getElementById('statDeliveries').textContent = agentData.totalDeliveries || 0;
+      document.getElementById('statAvailable').textContent  = available.length;
+      document.getElementById('statEarnings').textContent   = '₹' + ((agentData.totalDeliveries || 0) * 30);
+      document.getElementById('availCount').textContent     = available.length;
+
+      // Active delivery
+      const activeSection = document.getElementById('activeSection');
+      if (myOrder && myOrder.orderStatus === 'out_for_delivery') {
+        const items = (myOrder.products || myOrder.items || []).map(p => `${p.name||p.productName} ×${p.quantity||p.qty||1}`).join(', ');
+        activeSection.innerHTML = `
+          <div class="active-delivery">
+            <div class="active-tag"><i class="fas fa-circle" style="font-size:.5rem;color:#4caf50"></i> ACTIVE DELIVERY</div>
+            <div class="active-order-id">#${myOrder.orderId}</div>
+            <div class="active-row">
+              <i class="fas fa-user"></i>
+              <div class="active-row-text">
+                <strong>${myOrder.customerName || 'Customer'}</strong>
+                <span>${myOrder.phone || ''}</span>
+              </div>
+            </div>
+            <div class="active-row">
+              <i class="fas fa-map-marker-alt"></i>
+              <div class="active-row-text">${myOrder.address || myOrder.deliveryAddress || ''}</div>
+            </div>
+            <div class="active-row">
+              <i class="fas fa-box"></i>
+              <div class="active-row-text">${items}</div>
+            </div>
+            <div class="active-amount">₹${myOrder.totalPrice || myOrder.grandTotal || ''}</div>
+            <div class="active-payment">${(myOrder.paymentMethod||'').toUpperCase()}</div>
+            <div class="active-actions">
+              <button class="act-btn btn-navigate" onclick="openMap('${myOrder.address||myOrder.deliveryAddress||''}')">
+                <i class="fas fa-map"></i> Navigate
+              </button>
+              <button class="act-btn btn-delivered" id="deliverBtn" onclick="markDelivered('${myOrder.orderId}')">
+                <i class="fas fa-check-circle"></i> Mark Delivered
+              </button>
+            </div>
+          </div>`;
+      } else {
+        activeSection.innerHTML = '';
+      }
+
+      // Available orders
+      const container = document.getElementById('availableOrders');
+      if (!available.length) {
+        container.innerHTML = `<div class="empty"><div class="empty-icon">🏍️</div><div class="empty-text">No orders available</div><div class="empty-sub">Stay online to receive delivery requests</div></div>`;
+        return;
+      }
+
+      // Filter out the one already assigned to this agent
+      const displayOrders = myOrder
+        ? available.filter(o => o.orderId !== myOrder.orderId)
+        : available;
+
+      if (!displayOrders.length) {
+        container.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-text">You have an active delivery</div><div class="empty-sub">Complete it before picking up another</div></div>`;
+        return;
+      }
+
+      container.innerHTML = displayOrders.map(o => {
+        const items = (o.products || o.items || []).map(p => `${p.name||p.productName} ×${p.quantity||p.qty||1}`).join(', ');
+        const time  = new Date(o.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        return `
+          <div class="order-card">
+            <div class="card-head">
+              <div>
+                <div class="order-id">#${o.orderId}</div>
+                <div class="order-time">${time}</div>
+              </div>
+              <div>
+                <div class="order-amount">₹${o.totalPrice || o.grandTotal || ''}</div>
+                <div class="order-payment">${(o.paymentMethod||'').toUpperCase()}</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="detail-row">
+                <i class="fas fa-user"></i>
+                <span>${o.customerName || 'Customer'} &nbsp;·&nbsp; ${o.phone || ''}</span>
+              </div>
+              <div class="detail-row red">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>${o.address || o.deliveryAddress || ''}</span>
+              </div>
+              <div class="items-text"><i class="fas fa-box" style="color:#f5a623;margin-right:4px"></i>${items}</div>
+              <button class="accept-btn" id="btn-${o.orderId}" onclick="acceptDelivery('${o.orderId}',this)">
+                <i class="fas fa-motorcycle"></i> Accept & Pick Up
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+
+    } catch(e) { console.error(e); }
+  }
+
+  async function acceptDelivery(orderId, btn) {
+    btn.classList.add('loading');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Accepting...';
+    try {
+      const res = await fetch(`/api/delivery/orders/${orderId}`, {
+        method: 'PUT', headers,
+        body: JSON.stringify({ orderStatus: 'out_for_delivery' })
+      });
+      const d = await res.json();
+      if (d.success) { loadOrders(); }
+      else { alert('Error: ' + (d.message||'Failed')); btn.classList.remove('loading'); }
+    } catch { alert('Network error'); btn.classList.remove('loading'); }
+  }
+
+  async function markDelivered(orderId) {
+    if (!confirm('Mark this order as delivered?')) return;
+    const btn = document.getElementById('deliverBtn');
+    if (btn) { btn.classList.add('loading'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...'; }
+    try {
+      const res = await fetch(`/api/delivery/orders/${orderId}`, {
+        method: 'PUT', headers,
+        body: JSON.stringify({ orderStatus: 'delivered' })
+      });
+      const d = await res.json();
+      if (d.success) {
+        agentData.totalDeliveries = (agentData.totalDeliveries || 0) + 1;
+        localStorage.setItem('deliveryAgent', JSON.stringify(agentData));
+        loadOrders();
+      } else { alert('Error: ' + (d.message||'Failed')); }
+    } catch { alert('Network error'); }
+  }
+
+  function toggleAvailability() {
+    isAvailable = document.getElementById('availToggle').checked;
+    document.getElementById('availDot').className = 'avail-dot' + (isAvailable ? '' : ' off');
+    document.getElementById('availLabel').textContent = isAvailable ? 'Online' : 'Offline';
+    const banner = document.getElementById('statusBanner');
+    banner.className = 'status-banner ' + (isAvailable ? 'online' : 'offline');
+    banner.innerHTML = `<i class="fas fa-circle" style="font-size:.55rem"></i> ${isAvailable ? 'You are online and ready for deliveries' : 'You are offline — toggle to go online'}`;
+    fetch('/api/delivery/availability', { method: 'PUT', headers, body: JSON.stringify({ isAvailable }) }).catch(()=>{});
+  }
+
+  function openMap(address) {
+    window.open(`https://maps.google.com/?q=${encodeURIComponent(address)}`, '_blank');
+  }
+
+  function logout() {
+    socket.disconnect();
+    localStorage.removeItem('deliveryToken');
+    localStorage.removeItem('deliveryAgent');
+    window.location.href = '/delivery/login.html';
+  }
+
+  loadOrders();
+  setInterval(loadOrders, 20000);
+</script>
+</body>
+</html>

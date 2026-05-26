@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Delivery Login – GoNaatu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+
+    /* ── Full-screen hero image ── */
+    .hero{
+      position:fixed;inset:0;
+      background:url('https://images.unsplash.com/photo-1748522369232-63cd54f1a007?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200') center/cover no-repeat;
+      z-index:0;
+    }
+    /* indigo-tinted dark overlay for delivery theme */
+    .hero::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(
+        to bottom,
+        rgba(10,15,60,0.50) 0%,
+        rgba(10,15,60,0.60) 40%,
+        rgba(10,15,60,0.86) 68%,
+        rgba(10,15,60,0.97) 100%
+      );
+    }
+
+    /* ── Brand block ── */
+    .brand-block{
+      position:fixed;top:0;left:0;right:0;z-index:10;
+      padding:52px 28px 0;
+      display:flex;flex-direction:column;align-items:flex-start;
+    }
+    .brand-chip{
+      display:inline-flex;align-items:center;gap:7px;
+      background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);
+      backdrop-filter:blur(8px);
+      padding:6px 14px;border-radius:30px;
+      font-size:.72rem;font-weight:800;color:#fff;letter-spacing:1.2px;text-transform:uppercase;
+      margin-bottom:18px;
+    }
+    .brand-chip i{color:#ffd54f;font-size:.85rem}
+    .brand-headline{
+      font-size:2.05rem;font-weight:900;color:#fff;line-height:1.18;
+      text-shadow:0 2px 16px rgba(0,0,0,0.4);
+      margin-bottom:10px;
+    }
+    .brand-headline span{color:#ffd54f}
+    .brand-sub{font-size:.9rem;color:rgba(255,255,255,0.82);font-weight:500;line-height:1.5;max-width:310px}
+
+    /* ── Trust pills ── */
+    .trust-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .trust-pill{
+      display:inline-flex;align-items:center;gap:5px;
+      background:rgba(255,255,255,0.13);border:1px solid rgba(255,255,255,0.22);
+      backdrop-filter:blur(6px);
+      padding:5px 12px;border-radius:20px;
+      font-size:.72rem;font-weight:700;color:#fff;
+    }
+    .trust-pill i{color:#ffd54f;font-size:.75rem}
+
+    /* ── Bottom sheet ── */
+    .sheet{
+      position:fixed;bottom:0;left:0;right:0;z-index:20;
+      background:#fff;
+      border-radius:28px 28px 0 0;
+      padding:26px 24px 36px;
+      box-shadow:0 -8px 40px rgba(0,0,0,0.3);
+      max-height:75vh;
+      overflow-y:auto;
+      animation:slideUp .38s cubic-bezier(0.32,0.72,0,1);
+    }
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+    .drag-pill{width:40px;height:4px;background:#e0e0e0;border-radius:4px;margin:0 auto 20px}
+    .sheet-title{font-size:1.25rem;font-weight:900;color:#1a1a1a;margin-bottom:4px}
+    .sheet-sub{font-size:.82rem;color:#888;margin-bottom:22px}
+
+    .step{display:none}.step.active{display:block}
+
+    label{display:block;font-size:.8rem;font-weight:700;color:#444;margin-bottom:6px}
+    input,select{
+      width:100%;padding:13px 15px;
+      border:1.5px solid #e5e5e5;border-radius:13px;
+      font-size:.97rem;outline:none;
+      background:#fafafa;color:#1a1a1a;font-family:inherit;
+      transition:border-color .2s,box-shadow .2s;
+    }
+    input:focus,select:focus{border-color:#3949ab;background:#fff;box-shadow:0 0 0 3px rgba(57,73,171,0.1)}
+    .form-group{margin-bottom:16px}
+
+    /* vehicle select with emoji */
+    select{cursor:pointer;appearance:none;-webkit-appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 14px center;
+      padding-right:36px;
+    }
+
+    .phone-row{display:flex;gap:8px}
+    .country-code{
+      padding:13px 13px;border:1.5px solid #e5e5e5;border-radius:13px;
+      background:#fafafa;font-size:.97rem;color:#333;flex-shrink:0;font-weight:700;
+    }
+
+    .btn{
+      width:100%;padding:15px;border:none;border-radius:14px;
+      font-size:1rem;font-weight:800;cursor:pointer;
+      transition:all .18s;margin-top:6px;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .btn-primary{
+      background:linear-gradient(135deg,#3949ab,#1a237e);
+      color:#fff;box-shadow:0 6px 20px rgba(57,73,171,0.35);
+    }
+    .btn-primary:active{transform:scale(.98);opacity:.9}
+    .btn-secondary{background:#f5f5f5;color:#555;margin-top:12px}
+    .btn-secondary:active{transform:scale(.98)}
+
+    .otp-hint{font-size:.8rem;color:#999;text-align:center;margin-top:12px}
+    .otp-hint span{color:#3949ab;cursor:pointer;font-weight:700}
+
+    .otp-sent-info{
+      text-align:center;margin-bottom:20px;
+      padding:14px;background:#e8eaf6;border-radius:14px;border:1px solid #c5cae9;
+    }
+    .otp-sent-info .otp-icon{font-size:2rem;margin-bottom:6px}
+    .otp-sent-info h3{color:#1a237e;font-size:1.05rem;font-weight:800;margin-bottom:3px}
+    .otp-sent-info p{font-size:.8rem;color:#555}
+
+    input[type=number]{text-align:center;letter-spacing:10px;font-size:1.6rem;font-weight:800}
+
+    /* earnings highlight */
+    .earn-bar{
+      display:flex;align-items:center;gap:10px;
+      background:#fff8e1;border:1px solid #ffe082;border-radius:13px;
+      padding:12px 14px;margin-bottom:18px;
+    }
+    .earn-bar i{color:#f5a623;font-size:1.1rem;flex-shrink:0}
+    .earn-bar div{font-size:.82rem;color:#555;font-weight:600;line-height:1.4}
+    .earn-bar strong{color:#1a237e;font-size:.95rem}
+
+    .terms{font-size:.72rem;color:#bbb;text-align:center;margin-top:14px;line-height:1.5}
+    .terms a{color:#3949ab;font-weight:600;text-decoration:none}
+
+    .toast{
+      position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
+      background:#1a1a1a;color:#fff;
+      padding:10px 22px;border-radius:24px;font-size:.82rem;font-weight:600;
+      z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;
+    }
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+
+<!-- Full-screen hero -->
+<div class="hero"></div>
+
+<!-- Brand block over image -->
+<div class="brand-block">
+  <div class="brand-chip"><i class="fas fa-motorcycle"></i> GoNaatu Delivery</div>
+  <div class="brand-headline">Deliver with<br><span>GoNaatu!</span></div>
+  <div class="brand-sub">Earn ₹500–800/day on your schedule. Join Bangalore's fastest growing desi chicken delivery network.</div>
+  <div class="trust-row">
+    <div class="trust-pill"><i class="fas fa-star"></i> Daily Earnings</div>
+    <div class="trust-pill"><i class="fas fa-star"></i> Flexible Hours</div>
+    <div class="trust-pill"><i class="fas fa-star"></i> Instant Payout</div>
+  </div>
+</div>
+
+<!-- Bottom sheet -->
+<div class="sheet">
+  <div class="drag-pill"></div>
+
+  <!-- Step 1 -->
+  <div class="step active" id="step1">
+    <div class="sheet-title">Get Started</div>
+    <div class="sheet-sub">Enter your details to join as a delivery partner</div>
+
+    <div class="earn-bar">
+      <i class="fas fa-wallet"></i>
+      <div>Average earning <strong>₹650/day</strong> — flexible working hours, no target pressure</div>
+    </div>
+
+    <div class="form-group">
+      <label><i class="fas fa-user" style="color:#3949ab;margin-right:5px"></i>Your Name</label>
+      <input type="text" id="agentName" placeholder="Enter your full name" autocomplete="name">
+    </div>
+    <div class="form-group">
+      <label><i class="fas fa-motorcycle" style="color:#3949ab;margin-right:5px"></i>Vehicle Type</label>
+      <select id="vehicleType">
+        <option value="bike">🏍️ Bike</option>
+        <option value="scooter">🛵 Scooter</option>
+        <option value="bicycle">🚲 Bicycle</option>
+        <option value="other">🚗 Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label><i class="fas fa-phone" style="color:#3949ab;margin-right:5px"></i>Mobile Number</label>
+      <div class="phone-row">
+        <div class="country-code">+91</div>
+        <input type="tel" id="phone" placeholder="10-digit mobile number" maxlength="10" autocomplete="tel" inputmode="numeric">
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="sendOTP()">
+      <i class="fas fa-paper-plane"></i> Get OTP
+    </button>
+    <div class="terms">By continuing, you agree to GoNaatu's <a href="#">Terms & Conditions</a></div>
+  </div>
+
+  <!-- Step 2: OTP -->
+  <div class="step" id="step2">
+    <div class="otp-sent-info">
+      <div class="otp-icon">📱</div>
+      <h3>OTP Sent!</h3>
+      <p>Enter the 6-digit code sent to <strong id="displayPhone"></strong></p>
+    </div>
+    <div class="form-group">
+      <label>Enter OTP</label>
+      <input type="number" id="otpInput" placeholder="••••••" maxlength="6" inputmode="numeric">
+    </div>
+    <button class="btn btn-primary" onclick="verifyOTP()">
+      <i class="fas fa-check-circle"></i> Verify & Login
+    </button>
+    <p class="otp-hint">Didn't receive it? <span onclick="resendOTP()">Resend OTP</span></p>
+    <button class="btn btn-secondary" onclick="goBack()">
+      <i class="fas fa-arrow-left"></i> Back
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = '/api/delivery';
+  let currentPhone = '';
+
+  function showToast(msg, dur=3000) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), dur);
+  }
+
+  async function sendOTP() {
+    const name  = document.getElementById('agentName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    if (!name)               return showToast('Please enter your name');
+    if (phone.length !== 10) return showToast('Enter a valid 10-digit number');
+
+    currentPhone = phone;
+    document.querySelector('#step1 .btn-primary').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    document.querySelector('#step1 .btn-primary').disabled = true;
+
+    try {
+      const res  = await fetch(`${API}/otp/send`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ phone }) });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('displayPhone').textContent = `+91 ${phone}`;
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
+        if (data.debug_otp) document.getElementById('otpInput').value = data.debug_otp;
+        showToast('✅ OTP sent successfully!');
+      } else {
+        showToast(data.message || 'Failed to send OTP');
+      }
+    } catch { showToast('Network error — try again'); }
+    finally {
+      document.querySelector('#step1 .btn-primary').innerHTML = '<i class="fas fa-paper-plane"></i> Get OTP';
+      document.querySelector('#step1 .btn-primary').disabled = false;
+    }
+  }
+
+  async function verifyOTP() {
+    const otp         = document.getElementById('otpInput').value.trim();
+    const name        = document.getElementById('agentName').value.trim();
+    const vehicleType = document.getElementById('vehicleType').value;
+    if (otp.length !== 6) return showToast('Enter the 6-digit OTP');
+
+    document.querySelector('#step2 .btn-primary').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+    document.querySelector('#step2 .btn-primary').disabled = true;
+
+    try {
+      const res  = await fetch(`${API}/otp/verify`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ phone:currentPhone, otp, name, vehicleType }) });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem('deliveryToken', data.token);
+        localStorage.setItem('deliveryAgent', JSON.stringify(data.agent));
+        showToast('🎉 Welcome! Loading dashboard...', 1500);
+        setTimeout(() => window.location.href = '/delivery/dashboard.html', 800);
+      } else {
+        showToast(data.message || 'Verification failed');
+        document.querySelector('#step2 .btn-primary').innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
+        document.querySelector('#step2 .btn-primary').disabled = false;
+      }
+    } catch {
+      showToast('Network error — try again');
+      document.querySelector('#step2 .btn-primary').innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
+      document.querySelector('#step2 .btn-primary').disabled = false;
+    }
+  }
+
+  async function resendOTP() {
+    await fetch(`${API}/otp/send`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ phone:currentPhone }) });
+    showToast('OTP resent!');
+  }
+
+  function goBack() {
+    document.getElementById('step2').classList.remove('active');
+    document.getElementById('step1').classList.add('active');
+  }
+</script>
+</body>
+</html>

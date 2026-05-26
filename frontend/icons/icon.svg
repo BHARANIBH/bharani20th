@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="#2d6a2d"/>
+  <!-- Chicken drumstick silhouette -->
+  <g fill="#ffffff">
+    <!-- Drumstick bone -->
+    <ellipse cx="256" cy="340" rx="28" ry="90"/>
+    <!-- Drumstick meat bulb -->
+    <ellipse cx="256" cy="210" rx="95" ry="105"/>
+    <!-- Bone tip bottom -->
+    <ellipse cx="256" cy="428" rx="22" ry="20"/>
+  </g>
+  <!-- Leaf accents -->
+  <ellipse cx="180" cy="310" rx="22" ry="40" fill="#f5a623" transform="rotate(-30 180 310)"/>
+  <ellipse cx="332" cy="310" rx="22" ry="40" fill="#f5a623" transform="rotate(30 332 310)"/>
+  <!-- Brand text -->
+  <text x="256" y="496" font-family="Arial,sans-serif" font-size="52" font-weight="900" fill="#f5a623" text-anchor="middle" letter-spacing="-1">GoNaatu</text>
+</svg>

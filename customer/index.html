@@ -1,0 +1,4216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Pure Desi Country Chicken - Healthy Protein, Naturally Grown</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2d6a2d">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GoNaatu">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
+
+    <!-- SEO -->
+    <meta name="description" content="Fresh country chicken delivered to your door in 30 minutes. Order Pure Desi Country Chicken online in Bangalore.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/mobile.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+            color: #1a1a1a;
+        }
+
+        /* Header */
+        .header {
+            background-color: #fff;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-content {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #2d6a2d;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .logo span {
+            font-size: 0.55rem;
+            background-color: #f5a623;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 20px;
+            margin-left: 5px;
+            white-space: nowrap;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .header-icons i {
+            font-size: 1.2rem;
+            color: #333;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -12px;
+            background-color: #f5a623;
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 50%;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        /* Location Bar */
+        .location-bar {
+            background-color: #fff;
+            padding: 10px 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .location-bar .container {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #666;
+            flex: 1;
+        }
+
+        .location i {
+            color: #2d6a2d;
+            flex-shrink: 0;
+        }
+
+        .location span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .location.clickable {
+            cursor: pointer;
+        }
+
+        .location-picker-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 1001;
+            display: none;
+        }
+
+        .location-picker-overlay.show {
+            display: block;
+        }
+
+        .location-picker-modal {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fff;
+            border-radius: 18px 18px 0 0;
+            max-height: 85vh;
+            overflow: hidden;
+            z-index: 1002;
+            transform: translateY(100%);
+            transition: transform 0.25s ease;
+        }
+
+        .location-picker-overlay.show .location-picker-modal {
+            transform: translateY(0);
+        }
+
+        .location-picker-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid #ececec;
+        }
+
+        .location-picker-title {
+            font-size: 1.02rem;
+            font-weight: 700;
+        }
+
+        .location-close-btn {
+            border: none;
+            background: transparent;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .location-search-input {
+            width: calc(100% - 32px);
+            margin: 12px 16px 10px;
+            border: 1px solid #dbdbdb;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            padding: 12px 14px;
+        }
+
+        /* Keep Google Places suggestions above location modal */
+        .pac-container {
+            z-index: 2005 !important;
+        }
+
+        .location-map {
+            width: calc(100% - 32px);
+            margin: 0 16px;
+            height: 230px;
+            border: 1px solid #ececec;
+            border-radius: 12px;
+            background: #f5f5f5;
+        }
+
+        .location-apply-wrap {
+            padding: 12px 16px 16px;
+        }
+
+        .location-apply-btn {
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            background: #d10f4a;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 13px 16px;
+            cursor: pointer;
+        }
+
+        .delivery-time {
+            background-color: #f5f5f5;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* App Banner */
+        .app-banner {
+            background: linear-gradient(135deg, #2d6a2d 0%, #1e4a1e 100%);
+            margin: 12px 16px;
+            border-radius: 16px;
+            padding: 14px 16px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-banner div {
+            flex: 1;
+        }
+
+        .app-banner h3 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .app-banner p {
+            font-size: 0.7rem;
+            opacity: 0.9;
+        }
+
+        /* Category Navigation */
+        .category-nav {
+            background-color: white;
+            margin: 12px 16px;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .category-container {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .category-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 70px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .category-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .category-item.active {
+            background-color: #2d6a2d;
+            color: white;
+        }
+
+        .category-item i {
+            font-size: 1.4rem;
+            margin-bottom: 2px;
+        }
+
+        .category-item span {
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .categories-page {
+            display: none;
+            padding: 16px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 12px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 18px;
+            padding: 18px 16px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(0,0,0,0.12);
+        }
+
+        .category-card i {
+            display: inline-flex;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            background: #f3faf4;
+            color: #2d6a2d;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+
+        .category-card h4 {
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        .category-card p {
+            font-size: 0.75rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* Login Banner */
+        .login-banner {
+            background-color: white;
+            margin: 12px 16px;
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .login-banner div {
+            flex: 1;
+        }
+
+        .login-banner h4 {
+            font-size: 0.85rem;
+            margin-bottom: 2px;
+        }
+
+        .login-banner p {
+            font-size: 0.65rem;
+            color: #666;
+        }
+
+        .login-btn {
+            background-color: #2d6a2d;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* Flash Sale Banner */
+        .flash-sale {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff4500 100%);
+            margin: 12px 16px;
+            border-radius: 16px;
+            padding: 14px 16px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flash-sale-left h3 {
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .timer {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .timer-block {
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 4px 8px;
+            text-align: center;
+            min-width: 45px;
+        }
+
+        .timer-number {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .timer-label {
+            font-size: 0.55rem;
+            opacity: 0.8;
+        }
+
+        .flash-sale-right {
+            text-align: right;
+        }
+
+        .flash-sale-right .off-badge {
+            background: white;
+            color: #ff4500;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        /* Product Slider Section */
+        .product-slider-section {
+            margin: 16px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .section-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .section-header a {
+            color: #2d6a2d;
+            font-size: 0.7rem;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .slider-container {
+            position: relative;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .slider-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slider-products {
+            display: flex;
+            gap: 12px;
+        }
+
+        .slider-product-card {
+            min-width: 280px;
+            background: white;
+            border-radius: 16px;
+            padding: 12px;
+            scroll-snap-align: start;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+
+        .slider-product-image {
+            width: 100%;
+            height: 160px;
+            border-radius: 12px;
+            object-fit: cover;
+            background-color: #f0f0f0;
+        }
+
+        .slider-product-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin: 8px 0 4px;
+        }
+
+        .slider-product-meta {
+            font-size: 0.65rem;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .slider-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 6px 0;
+        }
+
+        .slider-current-price {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #2d6a2d;
+        }
+
+        .slider-original-price {
+            font-size: 0.7rem;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .slider-discount {
+            font-size: 0.65rem;
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        .delivery-badge {
+            font-size: 0.6rem;
+            color: #2d6a2d;
+            background: #e8f5e9;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin: 6px 0;
+        }
+
+        .slider-add-btn {
+            background-color: #2d6a2d;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+
+        .slider-add-btn:hover {
+            background-color: #1e4a1e;
+        }
+
+        .slider-quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .slider-quantity-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Regular Products Grid (Other Products) */
+        .products-section {
+            padding: 0 16px;
+            margin-bottom: 20px;
+        }
+
+        .products-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .product-image {
+            width: 90px;
+            height: 90px;
+            border-radius: 12px;
+            object-fit: cover;
+            background-color: #f0f0f0;
+            flex-shrink: 0;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .product-meta {
+            font-size: 0.65rem;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .current-price {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #2d6a2d;
+        }
+
+        .original-price {
+            font-size: 0.7rem;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .discount {
+            font-size: 0.65rem;
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        .add-btn {
+            background-color: #2d6a2d;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .quantity-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 16px;
+            border-top: 1px solid #eee;
+            max-width: 500px;
+            margin: 0 auto;
+            z-index: 100;
+        }
+
+        .bottom-nav .nav-item {
+            text-align: center;
+            cursor: pointer;
+            flex: 1;
+            border-radius: 12px;
+            padding: 6px 0;
+            transition: all 0.2s ease;
+        }
+
+        .bottom-nav .nav-item i {
+            font-size: 1.1rem;
+            color: #999;
+        }
+
+        .bottom-nav .nav-item span {
+            font-size: 0.65rem;
+            color: #999;
+            display: block;
+            margin-top: 3px;
+        }
+
+        .bottom-nav .nav-item.active i,
+        .bottom-nav .nav-item.active span {
+            color: #b50f45;
+        }
+
+        .bottom-nav .nav-item.active {
+            background: linear-gradient(135deg, #ffe9f1 0%, #fff4f8 100%);
+            box-shadow: 0 2px 10px rgba(181, 15, 69, 0.16);
+        }
+
+        /* Cart Sidebar */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background: white;
+            z-index: 200;
+            transition: right 0.3s;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-image {
+            width: 65px;
+            height: 65px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .cart-item-price {
+            color: #2d6a2d;
+            font-weight: 700;
+            margin-top: 3px;
+            font-size: 0.85rem;
+        }
+
+        .cart-quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .cart-quantity button {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+        }
+
+        .remove-item {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 0.7rem;
+            margin-left: 8px;
+        }
+
+        .cart-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .checkout-btn {
+            background-color: #2d6a2d;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Profile Modal */
+        .profile-modal {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background: #f6f3f7;
+            z-index: 200;
+            transition: left 0.3s;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .profile-modal.open {
+            left: 0;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #4c0830 0%, #b50f45 55%, #de2f68 100%);
+            padding: 28px 20px 24px;
+            color: white;
+            text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 8px 24px rgba(95, 11, 47, 0.3);
+        }
+
+        .profile-avatar {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+        }
+
+        .profile-avatar i {
+            font-size: 2.5rem;
+            color: #b50f45;
+        }
+
+        .profile-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .profile-email {
+            font-size: 0.7rem;
+            opacity: 0.9;
+        }
+
+        .profile-contact {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        .profile-menu {
+            padding: 16px 12px 20px;
+        }
+
+        .profile-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 12px;
+            border: 1px solid #ece3ea;
+            border-radius: 14px;
+            margin-bottom: 10px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+        }
+
+        .profile-menu-item i {
+            width: 22px;
+            color: #b50f45;
+            font-size: 1rem;
+        }
+
+        .profile-menu-item span {
+            flex: 1;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .profile-menu-item.logout-btn {
+            border-color: #f3d7e0;
+            background: #fff7fa;
+        }
+
+        .profile-menu-item.logout-btn i,
+        .profile-menu-item.logout-btn span {
+            color: #b50f45;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 199;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        .container-page {
+            max-width: 500px;
+            margin: 0 auto;
+            padding-bottom: 65px;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2d6a2d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            z-index: 300;
+            animation: slideUp 0.3s ease;
+            white-space: nowrap;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .cart-notification {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2d6a2d;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            z-index: 300;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .cart-notif-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .view-cart-btn {
+            background: white;
+            color: #2d6a2d;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .about-hero {
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .about-hero h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .about-hero p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .about-content {
+            padding: 24px 16px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: calc(100vh - 120px);
+        }
+
+        /* Hero Section */
+        .about-hero-section {
+            position: relative;
+            height: 300px;
+            background-image: url('https://images.unsplash.com/photo-1748522369232-63cd54f1a007?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 0 0 24px 24px;
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(45, 106, 45, 0.8) 0%, rgba(45, 106, 45, 0.6) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-content {
+            text-align: center;
+            color: white;
+            padding: 0 16px;
+            max-width: 600px;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .about-description {
+            text-align: center;
+            margin-bottom: 32px;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(45, 106, 45, 0.1);
+        }
+
+        .about-description h3 {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+            color: #2d6a2d;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .about-description p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .about-image-wrapper {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .about-image-wrapper img {
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 24px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+            object-fit: cover;
+            display: inline-block;
+        }
+
+        /* Why Choose Us */
+        .why-choose-us {
+            margin-bottom: 48px;
+        }
+
+        .why-choose-us h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d6a2d;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .why-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .why-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(45, 106, 45, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .why-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        }
+
+        .why-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .why-card h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d6a2d;
+            margin-bottom: 8px;
+        }
+
+        .why-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Our Values */
+        .our-values {
+            margin-bottom: 48px;
+        }
+
+        .our-values h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d6a2d;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .value-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid rgba(45, 106, 45, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .value-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .value-item h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2d6a2d;
+            margin-bottom: 6px;
+        }
+
+        .value-item p {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .contact-card {
+            background: white;
+            border: 1px solid rgba(45, 106, 45, 0.15);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .contact-card-title {
+            color: #2d6a2d;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(45, 106, 45, 0.02);
+            transition: background 0.2s ease;
+        }
+
+        .contact-item:hover {
+            background: rgba(45, 106, 45, 0.05);
+        }
+
+        .contact-item i {
+            color: #2d6a2d;
+            font-size: 1.6rem;
+            width: 28px;
+            margin-top: 2px;
+        }
+
+        .contact-item p,
+        .contact-item a {
+            color: #333;
+            font-size: 1rem;
+            line-height: 1.5;
+            text-decoration: none;
+            word-break: break-word;
+            font-weight: 500;
+        }
+
+        .social-links {
+            margin-top: 24px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .social-links a {
+            color: #2d6a2d;
+            font-size: 2.2rem;
+            transition: all 0.3s ease;
+            padding: 8px;
+            border-radius: 50%;
+            background: rgba(45, 106, 45, 0.05);
+        }
+
+        .social-links a:hover {
+            color: #f5a623;
+            background: rgba(245, 166, 35, 0.1);
+            transform: scale(1.1);
+        }
+
+        .message-card {
+            background: white;
+            border: 1px solid rgba(45, 106, 45, 0.15);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .message-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .message-card h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2d6a2d;
+            letter-spacing: -0.5px;
+        }
+
+        .message-field {
+            margin-bottom: 20px;
+        }
+
+        .message-field label {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .message-field input,
+        .message-field textarea {
+            width: 100%;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: #fafafa;
+            color: #333;
+            padding: 14px 16px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .message-field input:focus,
+        .message-field textarea:focus {
+            border-color: #2d6a2d;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(45, 106, 45, 0.1);
+        }
+
+        .message-field input::placeholder,
+        .message-field textarea::placeholder {
+            color: #aaa;
+        }
+
+        .message-field textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .message-submit {
+            margin-top: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #2d6a2d 0%, #245a24 100%);
+            color: #fff;
+            padding: 16px 24px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .message-submit:hover {
+            background: linear-gradient(135deg, #245a24 0%, #1e4a1e 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 106, 45, 0.3);
+        }
+
+        /* Customer Trust */
+        .customer-trust {
+            background: #2d6a2d;
+            color: white;
+            border-radius: 16px;
+            padding: 32px 16px;
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .customer-trust h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .trust-badge {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .trust-number {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .trust-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Redesigned Cart Page */
+        .cart-page {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #f5f5f5;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .cart-page-shell {
+            max-width: 520px;
+            margin: 0 auto;
+            min-height: 100%;
+            background: #f5f5f5;
+            padding-bottom: 140px;
+        }
+
+        .cart-topbar {
+            background: #fff;
+            border-bottom: 1px solid #ececec;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 3;
+        }
+
+        .cart-back-btn {
+            border: none;
+            background: transparent;
+            font-size: 1.3rem;
+            color: #222;
+            cursor: pointer;
+        }
+
+        .cart-title {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .cart-saving-strip {
+            margin: 0;
+            background: #e8f6e8;
+            color: #165b29;
+            border-top: 1px solid #d4edd8;
+            border-bottom: 1px solid #d4edd8;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+        }
+
+        .cart-saving-strip strong {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+
+        .cart-page-items {
+            padding: 12px 12px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkout-card {
+            background: #fff;
+            border: 1px solid #ececec;
+            border-radius: 14px;
+            margin: 12px;
+            padding: 14px;
+        }
+
+        .slot-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slot-title {
+            font-weight: 600;
+            color: #272727;
+            margin-bottom: 4px;
+        }
+
+        .slot-value {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .slot-btn {
+            border: 1px solid #f1c7d7;
+            background: #fff5f9;
+            color: #b50f45;
+            border-radius: 10px;
+            height: 38px;
+            padding: 0 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .coupon-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .coupon-input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 0.9rem;
+        }
+
+        .coupon-apply-btn {
+            border: none;
+            background: #d10f4a;
+            color: #fff;
+            border-radius: 10px;
+            padding: 0 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .coupon-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .coupon-chip {
+            border: 1px solid #f0cad8;
+            background: #fff;
+            color: #b50f45;
+            border-radius: 999px;
+            padding: 6px 11px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .coupon-chip.active {
+            background: #b50f45;
+            color: #fff;
+            border-color: #b50f45;
+        }
+
+        .coupon-note {
+            font-size: 0.82rem;
+            margin-top: 8px;
+            color: #3f7d59;
+        }
+
+        .coupon-note.error {
+            color: #aa2a2a;
+        }
+
+        .cart-page-item {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #ececec;
+            padding: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .cart-page-item img {
+            width: 78px;
+            height: 78px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .cart-page-item-name {
+            font-size: 1.05rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .cart-page-price-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .cart-page-original {
+            font-size: 0.9rem;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .cart-page-final {
+            font-size: 1.25rem;
+            color: #202020;
+            font-weight: 700;
+        }
+
+        .cart-page-qty {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid #e3d3da;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .cart-page-qty button {
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: #fff;
+            color: #8e1040;
+            font-size: 1.4rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .cart-page-qty span {
+            min-width: 32px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .cart-block {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #ececec;
+            margin: 12px;
+            padding: 14px;
+        }
+
+        .cart-block h3 {
+            font-size: 1.7rem;
+            margin-bottom: 12px;
+        }
+
+        .bill-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #252525;
+        }
+
+        .bill-row.muted span:last-child {
+            color: #a0a0a0;
+            text-decoration: line-through;
+        }
+
+        .bill-row.saving span:last-child {
+            color: #2f8c53;
+            font-weight: 700;
+        }
+
+        .bill-divider {
+            border-top: 1px solid #ececec;
+            margin: 12px 0;
+        }
+
+        .bill-total {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .free-delivery-banner {
+            background: #f9e9f2;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 6px 0 10px;
+        }
+
+        .free-delivery-banner strong {
+            color: #5f0033;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .free-delivery-banner span {
+            color: #6f5f68;
+            font-size: 0.82rem;
+        }
+
+        .free-delivery-banner button {
+            background: #6c0035;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            padding: 9px 14px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .policy-list {
+            margin-left: 18px;
+            color: #444;
+            display: grid;
+            gap: 8px;
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .trust-item {
+            border: 1px solid #ececec;
+            border-radius: 12px;
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #4b4b4b;
+            background: #fcfcfc;
+        }
+
+        .trust-item i {
+            display: block;
+            color: #b50f45;
+            margin-bottom: 4px;
+        }
+
+        .help-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .help-actions button {
+            flex: 1;
+            border: 1px solid #e8d3dc;
+            border-radius: 10px;
+            background: #fff;
+            color: #7b2d4d;
+            font-weight: 600;
+            padding: 10px 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .cart-address-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fff;
+            border-top: 1px solid #ececec;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+            z-index: 4;
+        }
+
+        .cart-address-inner {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 10px 12px 12px;
+        }
+
+        .cart-address-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .cart-address-row .address-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #333;
+        }
+
+        .cart-address-edit {
+            border: none;
+            background: transparent;
+            color: #d1124b;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .cart-pay-btn {
+            width: 100%;
+            border: none;
+            border-radius: 14px;
+            background: #d10f4a;
+            color: #fff;
+            font-size: 1.7rem;
+            font-weight: 700;
+            padding: 14px 16px;
+            cursor: pointer;
+        }
+
+        /* Redesigned Payment Page */
+        .payment-page {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #f3f3f3;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .payment-shell {
+            max-width: 520px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+
+        .payment-topbar {
+            background: #fff;
+            border-bottom: 1px solid #e9e9e9;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 3;
+        }
+
+        .payment-topbar h2 {
+            font-size: 1.7rem;
+            font-weight: 700;
+        }
+
+        .payment-section {
+            background: #efefef;
+            border-top: 1px solid #e5e5e5;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 14px 0 12px;
+            margin-bottom: 10px;
+        }
+
+        .payment-section-title {
+            font-size: 1.95rem;
+            font-weight: 700;
+            color: #303030;
+            margin: 0 16px 10px;
+        }
+
+        .payment-card {
+            margin: 0 16px;
+            border: 1px solid #dddddd;
+            border-radius: 12px;
+            background: #fff;
+            min-height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 0 14px;
+            cursor: pointer;
+        }
+
+        .payment-card + .payment-card {
+            margin-top: 10px;
+        }
+
+        .payment-card-left {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .payment-card-icon {
+            color: #202020;
+            font-size: 1.4rem;
+            width: 28px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .payment-card-label {
+            font-size: 1.5rem;
+            color: #2c2c2c;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .payment-card-action {
+            color: #b50f45;
+            font-weight: 700;
+            font-size: 1.35rem;
+            white-space: nowrap;
+        }
+
+        .payment-select-circle {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid #d6d6d6;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .payment-option.selected .payment-select-circle {
+            border-color: #b50f45;
+        }
+
+        .payment-option.selected .payment-select-circle::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: #b50f45;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .payment-radio {
+            display: none;
+        }
+
+        .payment-bottom-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fff;
+            border-top: 1px solid #e8e8e8;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+            z-index: 4;
+        }
+
+        .payment-bottom-inner {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 10px 12px 14px;
+        }
+
+        .payment-place-btn {
+            width: 100%;
+            border: none;
+            border-radius: 14px;
+            background: #d10f4a;
+            color: #fff;
+            font-size: 1.65rem;
+            font-weight: 700;
+            padding: 14px 16px;
+            cursor: pointer;
+        }
+
+        .payment-order-summary {
+            margin: 10px 16px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .payment-summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .payment-summary-row.total {
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+
+        .payment-summary-divider {
+            border-top: 1px solid #ececec;
+            margin: 10px 0;
+        }
+
+        .slot-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.36);
+            z-index: 1005;
+            display: none;
+            align-items: flex-end;
+        }
+
+        .slot-modal.show {
+            display: flex;
+        }
+
+        .slot-sheet {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 18px 18px 0 0;
+            padding: 14px 16px 18px;
+        }
+
+        .slot-sheet h4 {
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .slot-option {
+            width: 100%;
+            border: 1px solid #e8e8e8;
+            border-radius: 12px;
+            background: #fff;
+            padding: 12px;
+            text-align: left;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2c2c2c;
+        }
+
+        .slot-option.active {
+            border-color: #b50f45;
+            background: #fff4f8;
+            color: #b50f45;
+        }
+
+        /* ── OTP Login Modal – Premium chicken-image bottom sheet ── */
+        .otp-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            background: rgba(0,0,0,0.55);
+            z-index: 1200;
+            backdrop-filter: blur(3px);
+        }
+
+        .otp-modal-card {
+            width: 100%;
+            max-width: 500px;
+            background: #fff;
+            border-radius: 26px 26px 0 0;
+            box-shadow: 0 -8px 40px rgba(0,0,0,0.28);
+            overflow: hidden;
+            animation: otpSlideUp .35s cubic-bezier(0.32,0.72,0,1);
+        }
+        @keyframes otpSlideUp {
+            from { transform: translateY(100%); }
+            to   { transform: translateY(0); }
+        }
+
+        /* chicken image hero banner */
+        .otp-brand {
+            position: relative;
+            width: 100%;
+            height: 190px;
+            background: url('https://images.unsplash.com/photo-1748522369232-63cd54f1a007?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200') center/cover no-repeat;
+            overflow: hidden;
+        }
+        .otp-brand::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(10,30,10,0.3) 0%, rgba(10,30,10,0.75) 100%);
+        }
+        .otp-brand-inner {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            z-index: 1;
+            padding: 16px 20px 18px;
+        }
+        .otp-brand-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(6px);
+            padding: 4px 12px; border-radius: 20px;
+            font-size: .68rem; font-weight: 800; color: #fff;
+            letter-spacing: 1px; text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .otp-brand-mark { display: none; }  /* hide old emoji mark */
+        .otp-brand-title {
+            color: #fff;
+            font-weight: 900;
+            font-size: 1.45rem;
+            line-height: 1.15;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+        }
+        .otp-brand-sub {
+            color: rgba(255,255,255,0.82);
+            font-weight: 500;
+            font-size: .82rem;
+            margin-top: 3px;
+        }
+
+        /* form area */
+        .otp-form-area {
+            padding: 22px 22px 16px;
+        }
+        /* drag pill */
+        .otp-drag-pill {
+            width: 36px; height: 4px; background: #e0e0e0;
+            border-radius: 4px; margin: 0 auto 18px;
+        }
+
+        .otp-helper {
+            font-size: .88rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .otp-field { margin-bottom: 13px; }
+        .otp-field label {
+            display: block;
+            color: #333;
+            font-size: .8rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .otp-field input {
+            width: 100%;
+            border: 1.5px solid #e5e5e5;
+            border-radius: 13px;
+            background: #fafafa;
+            color: #1a1a1a;
+            padding: 13px 14px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .otp-field input:focus {
+            border-color: #2d6a2d;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(45,106,45,0.1);
+        }
+
+        .otp-verify-btn {
+            width: 100%;
+            border: none;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #2d6a2d, #1a3a1a);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 800;
+            padding: 14px 16px;
+            cursor: pointer;
+            margin-top: 4px;
+            box-shadow: 0 6px 18px rgba(45,106,45,0.32);
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+            transition: opacity .18s, transform .18s;
+        }
+        .otp-verify-btn:active { transform: scale(.98); opacity: .9; }
+
+        .otp-secondary-row {
+            text-align: center;
+            margin-top: 11px;
+        }
+        .otp-secondary-link {
+            color: #2d6a2d;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: .85rem;
+        }
+
+        .otp-cancel-btn {
+            width: 100%;
+            margin-top: 10px;
+            border: 1.5px solid #e5e5e5;
+            background: #fafafa;
+            color: #666;
+            border-radius: 13px;
+            padding: 11px 14px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .health-popup-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(7, 10, 18, 0.78);
+            z-index: 1250;
+            padding: 10px;
+        }
+
+        .health-popup-card {
+            width: 100%;
+            max-width: 470px;
+            min-height: min(88vh, 680px);
+            background: linear-gradient(180deg, #f8f1e6 0%, #efe6d8 100%);
+            border-radius: 20px;
+            overflow: hidden auto;
+            box-shadow: 0 22px 48px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(165, 21, 68, 0.2);
+            position: relative;
+        }
+
+        .health-popup-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.55);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .health-popup-image {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .health-popup-content {
+            padding: 16px 16px 18px;
+        }
+
+        .health-popup-kicker {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #fff;
+            border: 1px solid #e3d7cb;
+            color: #9f123f;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .health-popup-title {
+            margin: 0 0 8px;
+            color: #9f123f;
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .health-popup-text {
+            margin: 0;
+            color: #2a2a2a;
+            line-height: 1.45;
+            font-size: 0.92rem;
+        }
+
+        .health-popup-btn {
+            margin-top: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 11px;
+            background: linear-gradient(180deg, #b8164b 0%, #9f123f 100%);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 800;
+            padding: 12px 16px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 480px) {
+            .cart-title {
+                font-size: 1.1rem;
+            }
+            .cart-block h3 {
+                font-size: 0.95rem;
+            }
+            .cart-pay-btn {
+                font-size: 1rem;
+            }
+            .payment-topbar h2 {
+                font-size: 1.9rem;
+            }
+            .payment-section-title {
+                font-size: 0.95rem;
+            }
+            .payment-card-label {
+                font-size: 0.95rem;
+            }
+            .payment-card-action {
+                font-size: 0.92rem;
+            }
+            .payment-place-btn {
+                font-size: 1rem;
+            }
+            .slider-product-card {
+                min-width: 260px;
+            }
+            .slider-product-image {
+                height: 140px;
+            }
+            .logo {
+                font-size: 0.75rem;
+            }
+            .logo span {
+                font-size: 0.5rem;
+            }
+            .otp-modal {
+                align-items: flex-end;
+                padding: 0;
+            }
+            .otp-modal-card {
+                max-width: 100%;
+                border-radius: 24px 24px 0 0;
+            }
+            .otp-brand {
+                height: 160px;
+            }
+            .otp-brand-title {
+                font-size: 1.3rem;
+            }
+            .otp-helper {
+                font-size: .88rem;
+            }
+            .health-popup-overlay {
+                padding: 0;
+                align-items: flex-end;
+            }
+            .health-popup-card {
+                max-width: 100%;
+                min-height: 92vh;
+                border-radius: 18px 18px 0 0;
+                border-left: none;
+                border-right: none;
+                border-bottom: none;
+            }
+            .health-popup-image {
+                height: 42vh;
+            }
+            .about-description h3 {
+                font-size: 1.5rem;
+            }
+            .about-description p {
+                font-size: 0.9rem;
+            }
+            .why-choose-us h2,
+            .our-values h2 {
+                font-size: 1.8rem;
+            }
+            .why-card,
+            .contact-card,
+            .message-card {
+                padding: 20px;
+            }
+            .contact-card-title,
+            .message-card h3 {
+                font-size: 1.4rem;
+            }
+            .hero-title {
+                font-size: 2rem;
+            }
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            .why-grid {
+                grid-template-columns: 1fr;
+            }
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+            .trust-grid {
+                grid-template-columns: 1fr;
+            }
+            .customer-trust h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .about-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .about-description {
+                max-width: 700px;
+                margin: 0 auto 32px;
+                padding: 32px;
+            }
+            .about-description h3 {
+                font-size: 2rem;
+            }
+            .about-description p {
+                font-size: 1.1rem;
+            }
+            .why-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .values-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .contact-card,
+            .message-card {
+                padding: 32px;
+            }
+            .contact-card-title,
+            .message-card h3 {
+                font-size: 1.8rem;
+            }
+            .hero-title {
+                font-size: 3rem;
+            }
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            .trust-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="offlineBanner" class="offline-banner">No internet connection — showing cached content</div>
+    <div class="container-page" id="mainContainer">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo" onclick="showHome()">
+                    🐔 PURE DESI COUNTRY CHICKEN<span>Natural</span>
+                </div>
+                <div class="header-icons">
+                    <i class="fas fa-search" onclick="showSearch()"></i>
+                    <button class="login-btn" onclick="openOTPModal()">Login</button>
+                    <i class="fas fa-shopping-cart" onclick="openCart()" style="cursor: pointer;">
+                        <span class="cart-badge" id="cartCountIcon">0</span>
+                    </i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="homeContent">
+            <!-- Location Bar -->
+            <div class="location-bar">
+                <div class="container">
+                    <div class="location clickable" onclick="openLocationPicker()">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="homeLocationLabel">Bangalore - 21/1, KPWD Quarters...</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="delivery-time">
+                        <i class="far fa-clock"></i> 30 mins
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Banner -->
+            <div class="app-banner">
+                <div>
+                    <h3>Don't miss out!</h3>
+                    <p>Get the app for exclusive benefits</p>
+                </div>
+                <button class="get-app-btn">GET APP</button>
+            </div>
+
+            <!-- Category Navigation -->
+            <div class="category-nav">
+                <div class="category-container">
+                    <div class="category-item active" onclick="filterByCategory('all', event)">
+                        <i class="fas fa-th-large"></i>
+                        <span>All</span>
+                    </div>
+                    <div class="category-item" onclick="filterByCategory('chicken', event)">
+                        <i class="fas fa-drumstick-bite"></i>
+                        <span>Chicken</span>
+                    </div>
+                    <div class="category-item" onclick="filterByCategory('eggs', event)">
+                        <i class="fas fa-egg"></i>
+                        <span>Eggs</span>
+                    </div>
+                    <div class="category-item" onclick="filterByCategory('combos', event)">
+                        <i class="fas fa-box"></i>
+                        <span>Combos</span>
+                    </div>
+                    <div class="category-item" onclick="filterByCategory('ready-to-cook', event)">
+                        <i class="fas fa-utensils"></i>
+                        <span>Ready to Cook</span>
+                    </div>
+                    <div class="category-item" onclick="filterByCategory('spreads', event)">
+                        <i class="fas fa-jar"></i>
+                        <span>Spreads</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flash Sale Banner -->
+            <div class="flash-sale">
+                <div class="flash-sale-left">
+                    <h3>⚡ Flash Sale</h3>
+                    <div class="timer" id="timer">
+                        <div class="timer-block"><div class="timer-number" id="hours">08</div><div class="timer-label">Hrs</div></div>
+                        <div class="timer-block"><div class="timer-number" id="minutes">23</div><div class="timer-label">Mins</div></div>
+                        <div class="timer-block"><div class="timer-number" id="seconds">28</div><div class="timer-label">Secs</div></div>
+                    </div>
+                </div>
+                <div class="flash-sale-right">
+                    <div class="off-badge">44% OFF</div>
+                </div>
+            </div>
+
+            <!-- Product Slider Section - Our Current Hits -->
+            <div class="product-slider-section">
+                <div class="section-header">
+                    <h2>🔥 Our current hits</h2>
+                    <a href="#" onclick="showAllProducts()">View All ></a>
+                </div>
+                <div class="slider-container">
+                    <div class="slider-products" id="sliderProducts"></div>
+                </div>
+            </div>
+
+            <!-- Why Pure Desi vs Broiler - Slider Section -->
+            <div class="section-header" style="margin: 16px 16px 12px;">
+                <h2>📊 Why Pure Desi Country Chicken?</h2>
+            </div>
+            <div class="comparison-slider" style="margin: 0 16px 16px; overflow-x: auto;">
+                <div class="comparison-cards" style="display: flex; gap: 12px;">
+                    <div class="comparison-card" style="min-width: 260px; background: white; border-radius: 16px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <h4>🐔 Protein Content</h4>
+                        <div class="feature" style="display: flex; justify-content: space-between; padding: 6px 0;"><span style="color:#2d6a2d; font-weight:600;">Pure Desi Chicken</span><span style="color:#2d6a2d; font-weight:600;">25-30%</span></div>
+                        <div class="feature" style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom:1px solid #eee;"><span style="color:#e74c3c;">Broiler Chicken</span><span style="color:#e74c3c;">15-18%</span></div>
+                        <div class="vs-badge" style="background:linear-gradient(135deg,#2d6a2d,#f5a623); color:white; padding:3px 10px; border-radius:20px; font-size:0.65rem; display:inline-block; margin-top:10px;">+40% More Protein</div>
+                    </div>
+                    <div class="comparison-card" style="min-width: 260px; background: white; border-radius: 16px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <h4>💊 Chemicals & Antibiotics</h4>
+                        <div class="feature" style="display: flex; justify-content: space-between; padding: 6px 0;"><span style="color:#2d6a2d; font-weight:600;">Pure Desi Chicken</span><span style="color:#2d6a2d; font-weight:600;">✓ None</span></div>
+                        <div class="feature" style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom:1px solid #eee;"><span style="color:#e74c3c;">Broiler Chicken</span><span style="color:#e74c3c;">✗ High Usage</span></div>
+                        <div class="vs-badge" style="background:linear-gradient(135deg,#2d6a2d,#f5a623); color:white; padding:3px 10px; border-radius:20px; font-size:0.65rem; display:inline-block; margin-top:10px;">100% Chemical Free</div>
+                    </div>
+                    <div class="comparison-card" style="min-width: 260px; background: white; border-radius: 16px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <h4>🍗 Fat Content</h4>
+                        <div class="feature" style="display: flex; justify-content: space-between; padding: 6px 0;"><span style="color:#2d6a2d; font-weight:600;">Pure Desi Chicken</span><span style="color:#2d6a2d; font-weight:600;">Low, Healthy</span></div>
+                        <div class="feature" style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom:1px solid #eee;"><span style="color:#e74c3c;">Broiler Chicken</span><span style="color:#e74c3c;">High, Unhealthy</span></div>
+                        <div class="vs-badge" style="background:linear-gradient(135deg,#2d6a2d,#f5a623); color:white; padding:3px 10px; border-radius:20px; font-size:0.65rem; display:inline-block; margin-top:10px;">Better for Heart</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Bites Section -->
+            <div class="product-slider-section">
+                <div class="section-header">
+                    <h2>🍗 Quick Bites. Loud Cheers.</h2>
+                    <a href="#" onclick="showAllProducts()">View All ></a>
+                </div>
+                <div class="slider-container">
+                    <div class="slider-products" id="quickBitesSlider"></div>
+                </div>
+            </div>
+
+            <!-- Health Benefits Cards -->
+            <div class="health-cards" style="display: flex; gap: 12px; margin: 20px 16px; overflow-x: auto;">
+                <div class="health-card" style="min-width: 140px; background: white; border-radius: 16px; padding: 14px; text-align: center;">
+                    <i class="fas fa-dumbbell" style="font-size:1.6rem; color:#2d6a2d;"></i>
+                    <h4 style="font-size:0.8rem;">High Protein</h4>
+                    <p style="font-size:0.65rem; color:#666;">25-30% natural protein</p>
+                </div>
+                <div class="health-card" style="min-width: 140px; background: white; border-radius: 16px; padding: 14px; text-align: center;">
+                    <i class="fas fa-baby" style="font-size:1.6rem; color:#2d6a2d;"></i>
+                    <h4 style="font-size:0.8rem;">Safe for Kids</h4>
+                    <p style="font-size:0.65rem; color:#666;">No antibiotics</p>
+                </div>
+                <div class="health-card" style="min-width: 140px; background: white; border-radius: 16px; padding: 14px; text-align: center;">
+                    <i class="fas fa-heartbeat" style="font-size:1.6rem; color:#2d6a2d;"></i>
+                    <h4 style="font-size:0.8rem;">Heart Healthy</h4>
+                    <p style="font-size:0.65rem; color:#666;">Low cholesterol</p>
+                </div>
+                <div class="health-card" style="min-width: 140px; background: white; border-radius: 16px; padding: 14px; text-align: center;">
+                    <i class="fas fa-leaf" style="font-size:1.6rem; color:#2d6a2d;"></i>
+                    <h4 style="font-size:0.8rem;">Farm Fresh</h4>
+                    <p style="font-size:0.65rem; color:#666;">Free-range raised</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Content -->
+        <div id="searchContent" style="display: none;">
+            <div class="search-container" style="padding: 0 16px; margin-bottom: 16px;">
+                <div class="search-box" style="display: flex; align-items: center; background: white; border-radius: 12px; padding: 12px 16px; gap: 10px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search for chicken, curry cut, boneless..." onkeyup="filterProducts()" style="flex:1; border:none; outline:none;">
+                    <i class="fas fa-times" onclick="clearSearch()" style="cursor: pointer;"></i>
+                </div>
+            </div>
+            <div id="searchResults" class="products-section"></div>
+        </div>
+
+        <!-- About Page Content -->
+        <div id="aboutContent" style="display: none;">
+            <!-- Hero Section -->
+            <section class="about-hero-section">
+                <div class="hero-overlay">
+                    <div class="hero-content">
+                        <h1 class="hero-title">Pure Desi Country Chicken</h1>
+                        <p class="hero-subtitle">Fresh, natural, and sustainably raised chicken for your healthy lifestyle</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="about-content">
+                    <div class="about-image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1748522369232-63cd54f1a007?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200" alt="Pure Desi Country Chicken" />
+                </div>
+                <div class="about-description">
+                    <h3>Our Story</h3>
+                    <p>Pure Desi Country Chicken is committed to providing the freshest, healthiest chicken products sourced from free-range farms. We prioritize quality, sustainability, and customer satisfaction in every step of our process.</p>
+                </div>
+
+                <!-- Why Choose Us Section -->
+                <section class="why-choose-us">
+                    <h2>Why Choose Us</h2>
+                    <div class="why-grid">
+                        <div class="why-card">
+                            <div class="why-icon">🥬</div>
+                            <h4>100% Natural</h4>
+                            <p>Free-range, antibiotic-free chicken</p>
+                        </div>
+                        <div class="why-card">
+                            <div class="why-icon">⚡</div>
+                            <h4>Fresh Daily</h4>
+                            <p>Delivered fresh from farm to door</p>
+                        </div>
+                        <div class="why-card">
+                            <div class="why-icon">🏆</div>
+                            <h4>Premium Quality</h4>
+                            <p>Highest standards of taste & nutrition</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Our Values Section -->
+                <section class="our-values">
+                    <h2>Our Values</h2>
+                    <div class="values-grid">
+                        <div class="value-item">
+                            <h4>Quality</h4>
+                            <p>Uncompromising standards</p>
+                        </div>
+                        <div class="value-item">
+                            <h4>Sustainability</h4>
+                            <p>Eco-friendly practices</p>
+                        </div>
+                        <div class="value-item">
+                            <h4>Health</h4>
+                            <p>Nutritious & safe</p>
+                        </div>
+                        <div class="value-item">
+                            <h4>Trust</h4>
+                            <p>Transparent sourcing</p>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="about-grid">
+                    <div class="contact-card">
+                        <h3 class="contact-card-title">Get In Touch</h3>
+
+                        <div class="contact-item">
+                            <i class="fas fa-user"></i>
+                            <p><strong>Bharani B H</strong></p>
+                        </div>
+
+                        <div class="contact-item">
+                            <i class="far fa-envelope"></i>
+                            <a href="mailto:bharanihsbl@gmail.com">bharanihsbl@gmail.com</a>
+                        </div>
+
+                        <div class="contact-item">
+                            <i class="fas fa-phone-alt"></i>
+                            <a href="tel:+919380005746">+91 9380005746</a>
+                        </div>
+
+                        <div class="contact-item">
+                            <i class="fas fa-comment"></i>
+                            <p><em>For any queries, feel free to reach out to us. We're here to help!</em></p>
+                        </div>
+
+                        <div class="social-links">
+                            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-square"></i></a>
+                            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="message-card">
+                        <h3>Send a message</h3>
+
+                        <div class="message-field">
+                            <label for="aboutFirstName">First Name</label>
+                            <input id="aboutFirstName" type="text" placeholder="Enter your first name">
+                        </div>
+
+                        <div class="message-field">
+                            <label for="aboutLastName">Last Name</label>
+                            <input id="aboutLastName" type="text" placeholder="Enter your last name">
+                        </div>
+
+                        <div class="message-field">
+                            <label for="aboutEmail">Email Address</label>
+                            <input id="aboutEmail" type="email" placeholder="Enter your email address">
+                        </div>
+
+                        <div class="message-field">
+                            <label for="aboutMessage">Message</label>
+                            <textarea id="aboutMessage" placeholder="Type your message"></textarea>
+                        </div>
+
+                        <button class="message-submit" type="button" onclick="showNotification('Message form coming soon')">Submit</button>
+                    </div>
+                </div>
+
+                <!-- Customer Trust Badges -->
+                <section class="customer-trust">
+                    <h2>Trusted by Thousands</h2>
+                    <div class="trust-grid">
+                        <div class="trust-badge">
+                            <div class="trust-number">10K+</div>
+                            <div class="trust-label">Happy Customers</div>
+                        </div>
+                        <div class="trust-badge">
+                            <div class="trust-number">5★</div>
+                            <div class="trust-label">Average Rating</div>
+                        </div>
+                        <div class="trust-badge">
+                            <div class="trust-number">99%</div>
+                            <div class="trust-label">Freshness Guarantee</div>
+                        </div>
+                        <div class="trust-badge">
+                            <div class="trust-number">24/7</div>
+                            <div class="trust-label">Customer Support</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Categories Page Content -->
+        <div id="categoriesContent" class="categories-page" style="display: none;">
+            <div class="categories-hero" style="margin-bottom: 16px;">
+                <h2>Shop by Category</h2>
+                <p style="color: #666; font-size: 0.9rem;">Browse fresh chicken, eggs, combos and ready-to-cook favorites.</p>
+            </div>
+            <div class="categories-grid">
+                <div class="category-card" onclick="filterByCategory('chicken', event); showHome();">
+                    <i class="fas fa-drumstick-bite"></i>
+                    <h4>Chicken</h4>
+                    <p>Fresh chicken cuts, boneless, wings and whole birds.</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('eggs', event); showHome();">
+                    <i class="fas fa-egg"></i>
+                    <h4>Eggs</h4>
+                    <p>Free-range and premium eggs for daily meals.</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('combos', event); showHome();">
+                    <i class="fas fa-box"></i>
+                    <h4>Combos</h4>
+                    <p>Chicken + egg value packs for easy cooking.</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('ready-to-cook', event); showHome();">
+                    <i class="fas fa-utensils"></i>
+                    <h4>Ready to Cook</h4>
+                    <p>Marinated items that are ready to heat and eat.</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('spreads', event); showHome();">
+                    <i class="fas fa-jar"></i>
+                    <h4>Spreads</h4>
+                    <p>Convenient chicken spreads and sauces.</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('all', event); showHome();">
+                    <i class="fas fa-th-large"></i>
+                    <h4>All Products</h4>
+                    <p>Browse the full range of our fresh selection.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="showHome()" id="navHome"><i class="fas fa-home"></i><span>Home</span></div>
+        <div class="nav-item" onclick="showCategories()" id="navCategories"><i class="fas fa-th-large"></i><span>Categories</span></div>
+        <div class="nav-item" onclick="showSearch()" id="navSearch"><i class="fas fa-search"></i><span>Search</span></div>
+        <div class="nav-item" onclick="openCart()" id="navCart"><i class="fas fa-shopping-cart"></i><span>Cart</span></div>
+        <div class="nav-item" onclick="openProfile()" id="navAccount"><i class="fas fa-user"></i><span>Account</span></div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="overlay" id="overlay" onclick="closeCart()"></div>
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header"><h3>Your Cart</h3><i class="fas fa-times" onclick="closeCart()" style="cursor: pointer;"></i></div>
+        <div class="cart-items" id="cartItemsList"><p style="text-align: center; color: #999; padding: 20px;">Your cart is empty</p></div>
+        <div class="cart-footer" id="cartFooter" style="display: none;">
+            <div class="cart-total"><span>Total</span><span id="cartTotalAmount">₹0</span></div>
+            <button class="checkout-btn" onclick="viewCart()">View Cart</button>
+        </div>
+    </div>
+
+    <!-- Cart Page -->
+    <div id="cartPage" class="cart-page">
+        <div class="cart-page-shell">
+            <div class="cart-topbar">
+                <button onclick="closeCartPage()" class="cart-back-btn"><i class="fas fa-arrow-left"></i></button>
+                <h2 class="cart-title">Cart</h2>
+            </div>
+            <div id="cartSavingStrip" class="cart-saving-strip" style="display: none;"></div>
+            <div id="cartPageItems" class="cart-page-items"></div>
+            <div id="cartPageSummary"></div>
+            <div id="cartPagePolicies"></div>
+        </div>
+        <div id="cartPageFooter" class="cart-address-bar" style="display: none;">
+            <div class="cart-address-inner">
+                <div class="cart-address-row">
+                    <div class="address-text" id="cartAddressText">Add delivery address</div>
+                    <button class="cart-address-edit" onclick="navigateToAddresses()"><i class="fas fa-pen"></i></button>
+                </div>
+                <button id="payButton" class="cart-pay-btn" onclick="proceedToPayment()">Pay ₹0</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="locationPickerOverlay" class="location-picker-overlay" onclick="closeLocationPicker(event)">
+        <div class="location-picker-modal" onclick="event.stopPropagation()">
+            <div class="location-picker-header">
+                <div class="location-picker-title">Select delivery location</div>
+                <button class="location-close-btn" onclick="closeLocationPicker()"><i class="fas fa-times"></i></button>
+            </div>
+            <input id="locationSearchInput" class="location-search-input" type="text" placeholder="Search area, building or landmark">
+            <div id="homeLocationMap" class="location-map"></div>
+            <div class="location-apply-wrap">
+                <button class="location-apply-btn" onclick="applyPickedLocation()">Use this location</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Page -->
+    <div id="paymentPage" class="payment-page">
+        <div class="payment-shell">
+            <div class="payment-topbar">
+                <button onclick="closePaymentPage()" class="cart-back-btn"><i class="fas fa-arrow-left"></i></button>
+                <h2>Payment Options</h2>
+            </div>
+
+            <div id="paymentOrderSummary" class="payment-order-summary"></div>
+
+            <div class="payment-section">
+                <h3 class="payment-section-title">Saved Methods</h3>
+                <label class="payment-card payment-option" for="payment-upi" onclick="selectPaymentMethod('payment-upi', true)">
+                    <div class="payment-card-left">
+                        <i class="fas fa-mobile-alt payment-card-icon"></i>
+                        <span class="payment-card-label">UPI (Recommended)</span>
+                    </div>
+                    <span class="payment-card-action">Fast</span>
+                    <input class="payment-radio" id="payment-upi" type="radio" name="paymentMethod" value="upi">
+                </label>
+            </div>
+
+            <div class="payment-section">
+                <h3 class="payment-section-title">Credit & Debit Cards</h3>
+                <label class="payment-card payment-option" for="payment-card" onclick="selectPaymentMethod('payment-card', true)">
+                    <div class="payment-card-left">
+                        <i class="fas fa-plus payment-card-icon" style="color:#b50f45;"></i>
+                        <span class="payment-card-label" style="color:#b50f45;">Add New Card</span>
+                    </div>
+                    <span class="payment-select-circle"></span>
+                    <input class="payment-radio" id="payment-card" type="radio" name="paymentMethod" value="card">
+                </label>
+            </div>
+
+            <div class="payment-section">
+                <h3 class="payment-section-title">Net Banking</h3>
+                <label class="payment-card payment-option" for="payment-netbanking" onclick="selectPaymentMethod('payment-netbanking', true)">
+                    <div class="payment-card-left">
+                        <i class="fas fa-landmark payment-card-icon"></i>
+                        <span class="payment-card-label">View All Banks</span>
+                    </div>
+                    <i class="fas fa-chevron-right payment-card-icon" style="font-size:1.1rem;"></i>
+                    <input class="payment-radio" id="payment-netbanking" type="radio" name="paymentMethod" value="netbanking">
+                </label>
+            </div>
+
+            <div class="payment-section">
+                <h3 class="payment-section-title">Pay By Sodexo Cards</h3>
+                <div class="payment-card">
+                    <div class="payment-card-left">
+                        <i class="fas fa-plus payment-card-icon" style="color:#b50f45;"></i>
+                        <span class="payment-card-label" style="color:#b50f45;">Add New Sodexo Card</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="payment-section">
+                <h3 class="payment-section-title">Pay on Delivery</h3>
+                <label class="payment-card payment-option selected" for="payment-cod">
+                    <div class="payment-card-left">
+                        <i class="fas fa-money-check payment-card-icon"></i>
+                        <span class="payment-card-label">Pay via UPI at the time of delivery</span>
+                    </div>
+                    <span class="payment-select-circle"></span>
+                    <input class="payment-radio" id="payment-cod" type="radio" name="paymentMethod" value="cod" checked>
+                </label>
+                <div style="margin:8px 16px 0; font-size:0.82rem; color:#6f6f6f;">COD may include additional confirmation at doorstep.</div>
+            </div>
+
+            <div class="payment-section">
+                <h3 class="payment-section-title">Other Payment Methods</h3>
+                <label class="payment-card payment-option" for="payment-amazonpay" onclick="selectPaymentMethod('payment-amazonpay', true)">
+                    <div class="payment-card-left">
+                        <i class="fab fa-amazon-pay payment-card-icon"></i>
+                        <span class="payment-card-label">Amazon Pay</span>
+                    </div>
+                    <span class="payment-card-action">Link Account</span>
+                    <span class="payment-select-circle"></span>
+                    <input class="payment-radio" id="payment-amazonpay" type="radio" name="paymentMethod" value="amazonpay">
+                </label>
+            </div>
+        </div>
+        <div class="payment-bottom-bar">
+            <div class="payment-bottom-inner">
+                <button id="placeOrderButton" onclick="placeOrder()" class="payment-place-btn">Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="slotModal" class="slot-modal" onclick="closeSlotPicker(event)">
+        <div class="slot-sheet" onclick="event.stopPropagation()">
+            <h4>Select delivery slot</h4>
+            <button class="slot-option" data-slot="ASAP (20-30 mins)" onclick="selectDeliverySlot('ASAP (20-30 mins)')">ASAP (20-30 mins)</button>
+            <button class="slot-option" data-slot="Tomorrow 6 AM - 8 AM" onclick="selectDeliverySlot('Tomorrow 6 AM - 8 AM')">Tomorrow 6 AM - 8 AM</button>
+            <button class="slot-option" data-slot="Tomorrow 8 AM - 10 AM" onclick="selectDeliverySlot('Tomorrow 8 AM - 10 AM')">Tomorrow 8 AM - 10 AM</button>
+            <button class="slot-option" data-slot="Tomorrow 10 AM - 12 PM" onclick="selectDeliverySlot('Tomorrow 10 AM - 12 PM')">Tomorrow 10 AM - 12 PM</button>
+        </div>
+    </div>
+
+    <!-- Profile Sidebar -->
+    <div class="overlay" id="profileOverlay" onclick="closeProfile()"></div>
+    <div class="profile-modal" id="profileSidebar">
+        <div class="profile-header">
+            <div class="profile-avatar"><i class="fas fa-user"></i></div>
+            <div class="profile-name" id="profileName">Guest User</div>
+            <div class="profile-email" id="profileEmail">Login to personalize account</div>
+            <div class="profile-contact" id="profileContact">📞 Not logged in</div>
+        </div>
+        <div class="profile-menu">
+            <div class="profile-menu-item" onclick="navigateToOrders()"><i class="fas fa-box"></i><span>My Orders</span><i class="fas fa-chevron-right"></i></div>
+            <div class="profile-menu-item" onclick="showNotification('Rewards')"><i class="fas fa-gift"></i><span>Rewards & Offers</span><i class="fas fa-chevron-right"></i></div>
+            <div class="profile-menu-item" onclick="navigateToAddresses()"><i class="fas fa-map-marker-alt"></i><span>Saved Addresses</span><i class="fas fa-chevron-right"></i></div>
+            <div class="profile-menu-item" onclick="showAbout()"><i class="fas fa-info-circle"></i><span>About Us</span><i class="fas fa-chevron-right"></i></div>
+            <div class="profile-menu-item" onclick="showNotification('FAQs')"><i class="fas fa-question-circle"></i><span>FAQs</span><i class="fas fa-chevron-right"></i></div>
+            <div class="profile-menu-item logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span><i class="fas fa-chevron-right"></i></div>
+        </div>
+    </div>
+
+    <!-- OTP Login Modal -->
+    <div id="otpModal" class="otp-modal">
+        <div class="otp-modal-card">
+
+            <!-- Hero image banner -->
+            <div class="otp-brand">
+                <div class="otp-brand-inner">
+                    <div class="otp-brand-chip">🐔 GoNaatu</div>
+                    <div class="otp-brand-title">Pure Desi Country<br>Chicken</div>
+                    <div class="otp-brand-sub">Farm fresh · Delivered in 30 mins</div>
+                </div>
+            </div>
+
+            <!-- Form area -->
+            <div class="otp-form-area">
+                <div class="otp-drag-pill"></div>
+
+                <!-- Phone Input Step -->
+                <div id="phoneInputStep">
+                    <div class="otp-helper">Login to place your order</div>
+                    <div class="otp-field">
+                        <label for="loginName">Your Name</label>
+                        <input type="text" id="loginName" placeholder="Enter your name" autocomplete="name">
+                    </div>
+                    <div class="otp-field">
+                        <label for="phoneNumber">Mobile Number</label>
+                        <input type="tel" id="phoneNumber" placeholder="+91 Enter mobile number" inputmode="numeric">
+                    </div>
+                    <button class="otp-verify-btn" onclick="sendOTP()">
+                        <i class="fas fa-paper-plane"></i> Get OTP
+                    </button>
+                </div>
+
+                <!-- OTP Input Step -->
+                <div id="otpInputStep" style="display: none;">
+                    <div class="otp-helper">Enter the 6-digit OTP sent to your number</div>
+                    <div class="otp-field">
+                        <label for="otpCode">OTP Code</label>
+                        <input type="text" id="otpCode" placeholder="• • • • • •" maxlength="6" inputmode="numeric" style="text-align:center;letter-spacing:8px;font-size:1.5rem;font-weight:800">
+                    </div>
+                    <button class="otp-verify-btn" onclick="verifyOTP()">
+                        <i class="fas fa-check-circle"></i> Verify & Continue
+                    </button>
+                    <div class="otp-secondary-row">
+                        <a href="#" class="otp-secondary-link" onclick="resendOTP(); return false;">Didn't receive OTP? Resend</a>
+                    </div>
+                </div>
+
+                <button class="otp-cancel-btn" onclick="closeOTPModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="healthPopupOverlay" class="health-popup-overlay" onclick="closeHealthPopup(event)">
+        <div class="health-popup-card" onclick="event.stopPropagation()">
+            <button class="health-popup-close" onclick="closeHealthPopup()"><i class="fas fa-times"></i></button>
+            <img class="health-popup-image" src="https://kolkatameat.com/wp-content/uploads/2025/04/country-chicken-female.jpg" alt="Premium Desi Country Chicken">
+            <div class="health-popup-content">
+                <span class="health-popup-kicker">PREMIUM DESI COUNTRY CHICKEN</span>
+                <h3 class="health-popup-title">Premium Desi Country Chicken</h3>
+                <p class="health-popup-text">
+                    Naturally raised desi country chicken with rich flavor, clean protein and better nutrition for your family.
+                    Hand-picked premium birds inspired by top-quality country chicken standards.
+                </p>
+                <button class="health-popup-btn" onclick="orderNowFromPopup()">Order Now</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="js/otp.js"></script>
+    <script>
+        // Product Data
+        const products = [
+  { id: 1, name: "Chicken Curry Cut - Small Pieces", weight: "500 g | 12-18 Pieces | Serves 4", price: 169, originalPrice: 201, discount: 16, image: "https://static.wixstatic.com/media/8bcb0b_8a7a98ece34a495b82faeef4105c11b5~mv2.png/v1/fit/w_500,h_500,q_90/file.png", category: "chicken", delivery: "Delivery in 30 mins", isHit: true },
+  { id: 2, name: "Loaded Chicken Wings", weight: "200 g | 8 Pieces", price: 169, originalPrice: 199, discount: 15, image: "https://thenightowlchef.com/wp-content/uploads/2025/02/how-to-cut-chicken-wings-featured.jpg", category: "chicken", delivery: "Delivery in 30 mins", isHit: true },
+  { id: 3, name: "Whole Pure Desi Chicken", weight: "1 kg | Whole | Serves 4-5", price: 350, originalPrice: 400, discount: 13, image: "https://m.media-amazon.com/images/I/61qQtYB0KRL._AC_UF894,1000_QL80_.jpg", category: "chicken", delivery: "Delivery in 35 mins", isHit: false },
+  { id: 15, name: "Whole Pure Desi Chicken", weight: "500 gram | Whole", price: 185, originalPrice: 220, discount: 16, image: "https://m.media-amazon.com/images/I/61qQtYB0KRL._AC_UF894,1000_QL80_.jpg", category: "chicken", delivery: "Delivery in 35 mins", isHit: true },
+  { id: 4, name: "Pure Desi Chicken Boneless", weight: "1 kg | Boneless Cubes | Serves 3-4", price: 380, originalPrice: 450, discount: 16, image: "https://www.bbassets.com/media/uploads/p/l/40048898_5-fresho-chicken-curry-cut-without-skin-antibiotic-residue-free.jpg", category: "chicken", delivery: "Delivery in 30 mins", isHit: false },
+  { id: 13, name: "Chicken Curry Cut (Raw)", weight: "1 kg | Full Curry Cut", price: 370, originalPrice: 430, discount: 14, image: "https://static.wixstatic.com/media/8bcb0b_8a7a98ece34a495b82faeef4105c11b5~mv2.png/v1/fit/w_500,h_500,q_90/file.png", category: "chicken", delivery: "Delivery in 25 mins", isHit: true },
+  { id: 14, name: "Chicken Spread - Tandoori", weight: "1 kg | Ready to Eat | Single Serve", price: 400, originalPrice: 450, discount: 11, image: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400&h=300&fit=crop", category: "spreads", delivery: "Delivery in 25 mins", isHit: false }
+        ];
+
+        const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
+        let cart = JSON.parse(localStorage.getItem('pureDesiCart')) || [];
+        let cartPageHasAddress = false;
+        let cartPageAddress = null;
+        let razorpayPublicKey = '';
+        let selectedCoupon = JSON.parse(localStorage.getItem('pureDesiCoupon') || 'null');
+        let selectedDeliverySlot = localStorage.getItem('pureDesiDeliverySlot') || 'ASAP (20-30 mins)';
+        let locationMap;
+        let locationMarker;
+        let locationAutocomplete;
+        let locationGeocoder;
+        let selectedHomeLocation = {
+            title: 'Bangalore',
+            shortAddress: '21/1, KPWD Quarters...',
+            fullAddress: 'Bangalore',
+            pincode: '',
+            lat: 12.9716,
+            lng: 77.5946
+        };
+
+        function showNotification(msg) {
+            const notif = document.createElement('div');
+            notif.className = 'notification';
+            notif.textContent = msg;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 2000);
+        }
+
+        let healthPopupTimer = null;
+
+        function openHealthPopup() {
+            const overlay = document.getElementById('healthPopupOverlay');
+            if (!overlay) return;
+            overlay.style.display = 'flex';
+            if (healthPopupTimer) clearTimeout(healthPopupTimer);
+            healthPopupTimer = setTimeout(() => {
+                closeHealthPopup();
+            }, 5000);
+        }
+
+        function closeHealthPopup(event) {
+            if (event && event.target && event.target.id !== 'healthPopupOverlay') return;
+            const overlay = document.getElementById('healthPopupOverlay');
+            if (!overlay) return;
+            overlay.style.display = 'none';
+            if (healthPopupTimer) {
+                clearTimeout(healthPopupTimer);
+                healthPopupTimer = null;
+            }
+        }
+
+        function orderNowFromPopup() {
+            closeHealthPopup();
+            showHome();
+            const firstProductsSection = document.querySelector('.products-section');
+            if (firstProductsSection) {
+                firstProductsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function maybeShowHealthPopupAfterLogin() {
+            const shouldShow = sessionStorage.getItem('pureDesiShowHealthPopup') === '1';
+            const token = localStorage.getItem('pureDesiToken');
+            if (!shouldShow || !token) return;
+            sessionStorage.removeItem('pureDesiShowHealthPopup');
+            openHealthPopup();
+        }
+
+        function getCouponRules() {
+            return {
+                TRY20: { code: 'TRY20', type: 'percent', value: 20, maxDiscount: 120, minOrder: 299, description: '20% off up to ₹120 on orders above ₹299' },
+                FREEDEL: { code: 'FREEDEL', type: 'delivery', value: 39, minOrder: 199, description: 'Free delivery on orders above ₹199' },
+                WELCOME: { code: 'WELCOME', type: 'flat', value: 75, minOrder: 399, description: 'Flat ₹75 off on orders above ₹399' }
+            };
+        }
+
+        function persistCheckoutPrefs() {
+            localStorage.setItem('pureDesiCoupon', JSON.stringify(selectedCoupon));
+            localStorage.setItem('pureDesiDeliverySlot', selectedDeliverySlot);
+            localStorage.setItem('pureDesiCheckoutPrefs', JSON.stringify({
+                coupon: selectedCoupon?.code || null,
+                deliverySlot: selectedDeliverySlot
+            }));
+        }
+
+        function calculateCheckout() {
+            const itemTotal = cart.reduce((sum, item) => sum + ((item.originalPrice || item.price) * item.quantity), 0);
+            const discountedItemsTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const productSavings = Math.max(0, itemTotal - discountedItemsTotal);
+            const baseDeliveryFee = discountedItemsTotal > 0 ? 39 : 0;
+            const handlingFee = discountedItemsTotal > 0 ? 6 : 0;
+
+            let couponDiscount = 0;
+            let deliveryWaiver = 0;
+            let couponMessage = '';
+
+            if (selectedCoupon && selectedCoupon.code) {
+                const rule = getCouponRules()[selectedCoupon.code];
+                if (rule) {
+                    if (discountedItemsTotal >= rule.minOrder) {
+                        if (rule.type === 'percent') {
+                            couponDiscount = Math.min(Math.round((discountedItemsTotal * rule.value) / 100), rule.maxDiscount || 99999);
+                        } else if (rule.type === 'flat') {
+                            couponDiscount = rule.value;
+                        } else if (rule.type === 'delivery') {
+                            deliveryWaiver = Math.min(baseDeliveryFee, rule.value);
+                        }
+                        couponMessage = `Applied ${rule.code}: ${rule.description}`;
+                    } else {
+                        selectedCoupon = null;
+                        couponMessage = `Coupon removed: minimum order ₹${rule.minOrder} required`;
+                    }
+                }
+            }
+
+            const effectiveDeliveryDiscount = deliveryWaiver;
+            const payableDeliveryFee = Math.max(0, baseDeliveryFee - effectiveDeliveryDiscount);
+            const subtotalAfterCoupon = Math.max(0, discountedItemsTotal - couponDiscount);
+            const amountToPay = subtotalAfterCoupon + payableDeliveryFee + handlingFee;
+            const totalSavings = productSavings + effectiveDeliveryDiscount + couponDiscount;
+
+            return {
+                itemTotal,
+                discountedItemsTotal,
+                baseDeliveryFee,
+                handlingFee,
+                couponDiscount,
+                payableDeliveryFee,
+                totalSavings,
+                amountToPay,
+                couponMessage
+            };
+        }
+
+        function applyCoupon(code, silent = false) {
+            const normalized = String(code || '').trim().toUpperCase();
+            const rule = getCouponRules()[normalized];
+            if (!rule) {
+                if (!silent) showNotification('Invalid coupon code');
+                return;
+            }
+            selectedCoupon = { code: normalized };
+            persistCheckoutPrefs();
+            if (!silent) showNotification(`${normalized} applied`);
+            renderCartPage();
+        }
+
+        function removeCoupon() {
+            selectedCoupon = null;
+            persistCheckoutPrefs();
+            renderCartPage();
+        }
+
+        function openSlotPicker() {
+            const modal = document.getElementById('slotModal');
+            if (!modal) return;
+            modal.classList.add('show');
+            document.querySelectorAll('.slot-option').forEach((btn) => {
+                btn.classList.toggle('active', btn.dataset.slot === selectedDeliverySlot);
+            });
+        }
+
+        function closeSlotPicker(event) {
+            if (event && event.target && event.target.id !== 'slotModal') return;
+            const modal = document.getElementById('slotModal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        function selectDeliverySlot(slot) {
+            selectedDeliverySlot = slot;
+            persistCheckoutPrefs();
+            closeSlotPicker();
+            renderCartPage();
+        }
+
+        function extractPincodeFromComponents(addressComponents = []) {
+            const pinComponent = addressComponents.find((component) => component.types.includes('postal_code'));
+            return pinComponent ? pinComponent.long_name : '';
+        }
+
+        function restoreSelectedHomeLocation() {
+            try {
+                const raw = localStorage.getItem('pureDesiSelectedLocation');
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                selectedHomeLocation = {
+                    ...selectedHomeLocation,
+                    ...parsed
+                };
+            } catch (error) {
+                console.warn('Unable to parse selected location:', error);
+            }
+        }
+
+        function updateHomeLocationLabel() {
+            const label = document.getElementById('homeLocationLabel');
+            if (!label) return;
+            const text = selectedHomeLocation.shortAddress || selectedHomeLocation.fullAddress || 'Select location';
+            label.textContent = `${selectedHomeLocation.title || 'Bangalore'} - ${text}`;
+        }
+
+        function persistSelectedHomeLocation() {
+            localStorage.setItem('pureDesiSelectedLocation', JSON.stringify(selectedHomeLocation));
+            updateHomeLocationLabel();
+        }
+
+        function setPickedLocationFromPlace(place) {
+            if (!place || !place.geometry || !place.geometry.location) return;
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+            const formattedAddress = place.formatted_address || '';
+            const title = (place.address_components || []).find((comp) =>
+                comp.types.includes('sublocality') || comp.types.includes('locality')
+            )?.long_name || place.name || 'Selected Location';
+
+            selectedHomeLocation = {
+                title,
+                shortAddress: formattedAddress.split(',').slice(0, 2).join(',').trim(),
+                fullAddress: formattedAddress,
+                pincode: extractPincodeFromComponents(place.address_components || []),
+                lat,
+                lng
+            };
+
+            if (locationMap && locationMarker) {
+                locationMap.panTo({ lat, lng });
+                locationMarker.setPosition({ lat, lng });
+            }
+        }
+
+        function reverseGeocodeHomeLocation(lat, lng) {
+            if (!locationGeocoder) return;
+            locationGeocoder.geocode({ location: { lat, lng } }, (results, status) => {
+                if (status !== 'OK' || !results || !results[0]) return;
+                const result = results[0];
+                const title = (result.address_components || []).find((comp) =>
+                    comp.types.includes('sublocality') || comp.types.includes('locality')
+                )?.long_name || 'Selected Location';
+                selectedHomeLocation = {
+                    title,
+                    shortAddress: result.formatted_address.split(',').slice(0, 2).join(',').trim(),
+                    fullAddress: result.formatted_address,
+                    pincode: extractPincodeFromComponents(result.address_components || []),
+                    lat,
+                    lng
+                };
+            });
+        }
+
+        function initializeHomeLocationMap() {
+            if (!window.google || !google.maps) return;
+            const mapContainer = document.getElementById('homeLocationMap');
+            const input = document.getElementById('locationSearchInput');
+            if (!mapContainer || !input) return;
+
+            locationGeocoder = new google.maps.Geocoder();
+            locationMap = new google.maps.Map(mapContainer, {
+                center: { lat: selectedHomeLocation.lat, lng: selectedHomeLocation.lng },
+                zoom: 15,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false
+            });
+            locationMarker = new google.maps.Marker({
+                position: { lat: selectedHomeLocation.lat, lng: selectedHomeLocation.lng },
+                map: locationMap,
+                draggable: true
+            });
+
+            locationAutocomplete = new google.maps.places.Autocomplete(input, {
+                fields: ['geometry', 'formatted_address', 'address_components', 'name'],
+                componentRestrictions: { country: 'in' }
+            });
+
+            locationAutocomplete.addListener('place_changed', () => {
+                setPickedLocationFromPlace(locationAutocomplete.getPlace());
+            });
+
+            locationMap.addListener('click', (event) => {
+                const lat = event.latLng.lat();
+                const lng = event.latLng.lng();
+                locationMarker.setPosition({ lat, lng });
+                reverseGeocodeHomeLocation(lat, lng);
+            });
+
+            locationMarker.addListener('dragend', (event) => {
+                const lat = event.latLng.lat();
+                const lng = event.latLng.lng();
+                reverseGeocodeHomeLocation(lat, lng);
+            });
+        }
+
+        function openLocationPicker() {
+            const overlay = document.getElementById('locationPickerOverlay');
+            if (!overlay) return;
+            overlay.classList.add('show');
+            if (locationMap) {
+                google.maps.event.trigger(locationMap, 'resize');
+                locationMap.setCenter({ lat: selectedHomeLocation.lat, lng: selectedHomeLocation.lng });
+                locationMarker.setPosition({ lat: selectedHomeLocation.lat, lng: selectedHomeLocation.lng });
+            }
+        }
+
+        function closeLocationPicker(event) {
+            if (event && event.target && event.target.id !== 'locationPickerOverlay') return;
+            const overlay = document.getElementById('locationPickerOverlay');
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        function applyPickedLocation() {
+            persistSelectedHomeLocation();
+            closeLocationPicker();
+            showNotification('Location updated');
+        }
+
+        // Timer Function
+        function startTimer() {
+            let timeLeft = 8 * 3600 + 23 * 60 + 28;
+            const timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('hours').textContent = '00';
+                    document.getElementById('minutes').textContent = '00';
+                    document.getElementById('seconds').textContent = '00';
+                } else {
+                    timeLeft--;
+                    const hours = Math.floor(timeLeft / 3600);
+                    const minutes = Math.floor((timeLeft % 3600) / 60);
+                    const seconds = timeLeft % 60;
+                    document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                    document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                    document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+                }
+            }, 1000);
+        }
+
+        function saveCart() { localStorage.setItem('pureDesiCart', JSON.stringify(cart)); updateCartUI(); }
+        function updateCartUI() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCountIcon').textContent = count;
+            const cartItemsDiv = document.getElementById('cartItemsList');
+            const cartFooter = document.getElementById('cartFooter');
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">Your cart is empty</p>';
+                cartFooter.style.display = 'none';
+            } else {
+                cartItemsDiv.innerHTML = cart.map(item => {
+                    const product = products.find(p => p.id === item.id);
+                    return `<div class="cart-item"><img src="${item.image}" class="cart-item-image"><div class="cart-item-details"><div class="cart-item-title">${item.name}</div><div class="cart-item-price">₹${item.price}</div><div class="cart-quantity"><button onclick="updateCartQuantity(${item.id}, -1)">-</button><span>${item.quantity}</span><button onclick="updateCartQuantity(${item.id}, 1)">+</button><button class="remove-item" onclick="removeFromCart(${item.id})">Remove</button></div></div></div>`;
+                }).join('');
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                document.getElementById('cartTotalAmount').innerHTML = `₹${total}`;
+                cartFooter.style.display = 'block';
+            }
+        }
+
+        function updateCartQuantity(id, change) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) cart = cart.filter(i => i.id !== id);
+                saveCart();
+                renderSliders();
+                updateCartUI();
+                if (document.getElementById('cartPage').style.display === 'block') {
+                    renderCartPage();
+                }
+            }
+        }
+        function removeFromCart(id) {
+            cart = cart.filter(i => i.id !== id);
+            saveCart();
+            renderSliders();
+            updateCartUI();
+            if (document.getElementById('cartPage').style.display === 'block') {
+                renderCartPage();
+            }
+        }
+
+        function fetchUserAddress() {
+            const userId = localStorage.getItem('userId') || 'user123';
+            return fetch(`${API_URL}/addresses/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && Array.isArray(data.addresses) && data.addresses.length > 0) {
+                        return data.addresses[0];
+                    }
+                    const storedUser = localStorage.getItem('pureDesiUser');
+                    if (storedUser) {
+                        const user = JSON.parse(storedUser);
+                        if (user.address) {
+                            return {
+                                name: user.name || 'You',
+                                phone: user.phone || '',
+                                houseNo: user.houseNo || '',
+                                address: user.address,
+                                pincode: user.pincode || ''
+                            };
+                        }
+                    }
+                    return null;
+                })
+                .catch(() => {
+                    const storedUser = localStorage.getItem('pureDesiUser');
+                    if (storedUser) {
+                        const user = JSON.parse(storedUser);
+                        if (user.address) {
+                            return {
+                                name: user.name || 'You',
+                                phone: user.phone || '',
+                                houseNo: user.houseNo || '',
+                                address: user.address,
+                                pincode: user.pincode || ''
+                            };
+                        }
+                    }
+                    return null;
+                });
+        }
+
+        function viewCart() {
+            fetchUserAddress().then(address => {
+                const hasAddress = Boolean(address);
+                showCartPage(hasAddress, address);
+            });
+        }
+
+        function showCartPage(hasAddress = false, address = null) {
+            cartPageHasAddress = hasAddress;
+            cartPageAddress = address;
+            closeCart();
+            document.getElementById('cartPage').style.display = 'block';
+            renderCartPage();
+        }
+
+        function renderCartPage(hasAddress = cartPageHasAddress, address = cartPageAddress) {
+            const cartItemsDiv = document.getElementById('cartPageItems');
+            const cartFooter = document.getElementById('cartPageFooter');
+            const cartSummaryDiv = document.getElementById('cartPageSummary');
+            const cartPoliciesDiv = document.getElementById('cartPagePolicies');
+            const cartSavingStrip = document.getElementById('cartSavingStrip');
+            const cartAddressText = document.getElementById('cartAddressText');
+            const payButton = document.getElementById('payButton');
+            const totals = calculateCheckout();
+
+            if (cart.length === 0) {
+                cartSavingStrip.style.display = 'none';
+                cartItemsDiv.innerHTML = '<p style="text-align:center;color:#999;padding:40px 16px;">Your cart is empty</p>';
+                cartSummaryDiv.innerHTML = '';
+                cartPoliciesDiv.innerHTML = '';
+                cartFooter.style.display = 'none';
+                return;
+            }
+
+            cartSavingStrip.style.display = 'block';
+            cartSavingStrip.innerHTML = `<strong>You have saved ₹${totals.totalSavings}!</strong>Use code and save more on this order`;
+
+            cartItemsDiv.innerHTML = cart.map(item => `
+                <div class="cart-page-item">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div style="flex:1; min-width:0;">
+                        <div class="cart-page-item-name">${item.name}</div>
+                        <div class="cart-page-price-line">
+                            <span class="cart-page-original">₹${item.originalPrice || item.price}</span>
+                            <span class="cart-page-final">₹${item.price}</span>
+                        </div>
+                        <div class="cart-page-qty">
+                            <button onclick="updateCartQuantity(${item.id}, -1)">−</button>
+                            <span>${item.quantity}</span>
+                            <button onclick="updateCartQuantity(${item.id}, 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            cartSummaryDiv.innerHTML = `
+                <div class="checkout-card">
+                    <div class="slot-row">
+                        <div>
+                            <div class="slot-title"><i class="far fa-clock"></i> Delivery slot</div>
+                            <div class="slot-value">${selectedDeliverySlot}</div>
+                        </div>
+                        <button class="slot-btn" type="button" onclick="openSlotPicker()">Change Slot</button>
+                    </div>
+                </div>
+                <div class="checkout-card">
+                    <div class="slot-title">Apply Coupon</div>
+                    <div class="coupon-row">
+                        <input id="couponInput" class="coupon-input" placeholder="Enter coupon code (TRY20)">
+                        <button class="coupon-apply-btn" type="button" onclick="applyCoupon(document.getElementById('couponInput').value)">Apply</button>
+                    </div>
+                    <div class="coupon-chips">
+                        ${Object.keys(getCouponRules()).map(code => `<button type="button" class="coupon-chip ${selectedCoupon?.code === code ? 'active' : ''}" onclick="applyCoupon('${code}')">${code}</button>`).join('')}
+                        ${selectedCoupon ? '<button type="button" class="coupon-chip" onclick="removeCoupon()">Remove</button>' : ''}
+                    </div>
+                    ${totals.couponMessage ? `<div class="coupon-note ${totals.couponMessage.includes('removed') ? 'error' : ''}">${totals.couponMessage}</div>` : ''}
+                </div>
+                <div class="cart-block">
+                    <h3>Bill summary</h3>
+                    <div class="bill-row"><span>Item total</span><span>₹${totals.itemTotal}</span></div>
+                    <div class="bill-row"><span>Delivery Fee</span><span>₹${totals.baseDeliveryFee}</span></div>
+                    <div class="free-delivery-banner">
+                        <div>
+                            <strong>Save ₹${totals.baseDeliveryFee} with FREE delivery!</strong>
+                            <span>Add Infiniti at ₹9 for 1 month</span>
+                        </div>
+                        <button type="button">Add Infiniti</button>
+                    </div>
+                    <div class="bill-row muted"><span>Handling Fee</span><span>₹10</span></div>
+                    <div class="bill-row"><span></span><span>₹${totals.handlingFee}</span></div>
+                    ${totals.baseDeliveryFee > totals.payableDeliveryFee ? `<div class="bill-row saving"><span>Delivery Discount</span><span>- ₹${totals.baseDeliveryFee - totals.payableDeliveryFee}</span></div>` : ''}
+                    ${totals.couponDiscount > 0 ? `<div class="bill-row saving"><span>Coupon Discount (${selectedCoupon.code})</span><span>- ₹${totals.couponDiscount}</span></div>` : ''}
+                    <div class="bill-row saving"><span>Savings</span><span>- ₹${totals.totalSavings}</span></div>
+                    <div class="bill-divider"></div>
+                    <div class="bill-row bill-total"><span>Amount to be paid</span><span>₹${totals.amountToPay}</span></div>
+                </div>
+            `;
+
+            cartPoliciesDiv.innerHTML = `
+                <div class="cart-block">
+                    <h3>Policies</h3>
+                    <ul class="policy-list">
+                        <li>Item or quantity modification is not allowed post placing an order. Verify item details before you proceed</li>
+                        <li>Scheduled orders can be cancelled for free up to 2 hours before the slot. Express orders can be cancelled within 5 minutes, and 30 min orders within 2 minutes; post that, a fee may apply.</li>
+                        <li>You can reschedule your delivery to a later time only until items are dispatched</li>
+                    </ul>
+                </div>
+                <div class="checkout-card">
+                    <div class="slot-title">Need help?</div>
+                    <div class="slot-value">Our support team is available for quick order assistance.</div>
+                    <div class="help-actions">
+                        <button type="button" onclick="showNotification('Support call soon')">Call Support</button>
+                        <button type="button" onclick="showNotification('FAQ coming soon')">FAQ</button>
+                        <button type="button" onclick="showNotification('Chat support coming soon')">Chat Soon</button>
+                    </div>
+                </div>
+                <div class="checkout-card">
+                    <div class="slot-title">Why checkout with us</div>
+                    <div class="trust-grid">
+                        <div class="trust-item"><i class="fas fa-shield-alt"></i>Safe Payments</div>
+                        <div class="trust-item"><i class="fas fa-undo"></i>Easy Refund</div>
+                        <div class="trust-item"><i class="fas fa-leaf"></i>Fresh Guarantee</div>
+                    </div>
+                </div>
+            `;
+
+            cartAddressText.textContent = hasAddress && address
+                ? `${address.saveAs || 'Home'}, ${address.houseNo || ''}, ${address.address || ''}`.replace(/\s+,/g, ',').trim()
+                : 'Add delivery address';
+
+            if (hasAddress) {
+                payButton.textContent = `Pay ₹${totals.amountToPay}`;
+                payButton.onclick = proceedToPayment;
+                payButton.style.background = '#d10f4a';
+            } else {
+                payButton.textContent = 'Add Address';
+                payButton.onclick = () => { navigateToAddresses(); };
+                payButton.style.background = '#fd7e14';
+            }
+
+            cartFooter.style.display = 'block';
+        }
+
+        function closeCartPage() {
+            document.getElementById('cartPage').style.display = 'none';
+        }
+
+        function proceedToPayment() {
+            fetchUserAddress().then(address => {
+                if (!address) {
+                    showNotification('Please add a delivery address first');
+                    setTimeout(() => {
+                        navigateToAddresses();
+                    }, 1000);
+                    return;
+                }
+                if (!selectedDeliverySlot) {
+                    showNotification('Please choose a delivery slot');
+                    openSlotPicker();
+                    return;
+                }
+                document.getElementById('cartPage').style.display = 'none';
+                document.getElementById('paymentPage').style.display = 'block';
+                renderPaymentPage();
+            });
+        }
+
+        function closePaymentPage() {
+            document.getElementById('paymentPage').style.display = 'none';
+            document.getElementById('cartPage').style.display = 'block';
+        }
+
+        function renderPaymentPage() {
+            const totals = calculateCheckout();
+            const placeOrderButton = document.getElementById('placeOrderButton');
+            const paymentOrderSummary = document.getElementById('paymentOrderSummary');
+            const user = JSON.parse(localStorage.getItem('pureDesiUser') || 'null');
+            const maskedPhone = user?.phone ? `${String(user.phone).slice(0, 2)}******${String(user.phone).slice(-2)}` : 'Not logged in';
+            if (placeOrderButton) {
+                placeOrderButton.textContent = `Place Order • ₹${totals.amountToPay}`;
+            }
+            if (paymentOrderSummary) {
+                paymentOrderSummary.innerHTML = `
+                    <div class="payment-summary-row"><span>Account</span><span>${user?.name || 'Guest'} (${maskedPhone})</span></div>
+                    <div class="payment-summary-row"><span>Deliver by</span><span>${selectedDeliverySlot}</span></div>
+                    <div class="payment-summary-row"><span>Items total</span><span>₹${totals.itemTotal}</span></div>
+                    ${totals.couponDiscount > 0 ? `<div class="payment-summary-row"><span>Coupon (${selectedCoupon.code})</span><span>-₹${totals.couponDiscount}</span></div>` : ''}
+                    <div class="payment-summary-row"><span>Handling fee</span><span>₹${totals.handlingFee}</span></div>
+                    <div class="payment-summary-divider"></div>
+                    <div class="payment-summary-row total"><span>Payable now</span><span>₹${totals.amountToPay}</span></div>
+                `;
+            }
+            updatePaymentMethodUI();
+        }
+
+        function updatePaymentMethodUI() {
+            const options = document.querySelectorAll('.payment-option');
+            options.forEach(option => option.classList.remove('selected'));
+            const selectedInput = document.querySelector('input[name="paymentMethod"]:checked');
+            if (selectedInput) {
+                const selectedOption = selectedInput.closest('.payment-option');
+                if (selectedOption) selectedOption.classList.add('selected');
+                const placeOrderButton = document.getElementById('placeOrderButton');
+                if (placeOrderButton) {
+                    const totals = calculateCheckout();
+                    const methodLabel = selectedInput.value === 'cod' ? 'COD' : 'Online';
+                    placeOrderButton.textContent = `Pay ₹${totals.amountToPay} • ${methodLabel}`;
+                }
+            }
+        }
+
+        function selectPaymentMethod(inputId, autoProceed = false) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            input.checked = true;
+            updatePaymentMethodUI();
+            if (autoProceed) {
+                setTimeout(() => {
+                    placeOrder();
+                }, 150);
+            }
+        }
+
+        async function placeOrder() {
+            if (!isUserLoggedIn()) {
+                showNotification('Please login to place an order');
+                closeCartPage();
+                setTimeout(() => openOTPModal(), 500);
+                return;
+            }
+            
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+            if (!paymentMethod) {
+                showNotification('Please select a payment method');
+                return;
+            }
+
+            const totals = calculateCheckout();
+            const quantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const storedUser = localStorage.getItem('pureDesiUser');
+            const user = storedUser ? JSON.parse(storedUser) : null;
+            const orderId = 'ORD' + Date.now();
+
+            try {
+                const selectedAddress = await fetchUserAddress();
+                let finalStatus = 'Pending';
+                let paymentMeta = {};
+
+                if (paymentMethod.value !== 'cod') {
+                    if (!window.Razorpay) {
+                        showNotification('Payment service not loaded. Please refresh and try again.');
+                        return;
+                    }
+                    if (!razorpayPublicKey) {
+                        await loadPaymentConfig();
+                    }
+                    if (!razorpayPublicKey) {
+                        showNotification('Payment key missing on server');
+                        return;
+                    }
+
+                    const createOrderRes = await fetch(`${API_URL}/payments/create-order`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            amount: totals.amountToPay,
+                            currency: 'INR',
+                            receipt: orderId
+                        })
+                    });
+                    const createOrderData = await createOrderRes.json();
+                    if (!createOrderData.success) {
+                        showNotification(createOrderData.message || 'Unable to start payment');
+                        return;
+                    }
+
+                    const paymentResult = await new Promise((resolve) => {
+                        const options = {
+                            key: razorpayPublicKey,
+                            amount: createOrderData.amount,
+                            currency: createOrderData.currency || 'INR',
+                            name: 'Pure Desi Country Chicken',
+                            description: `Order ${orderId}`,
+                            order_id: createOrderData.orderId,
+                            prefill: {
+                                name: user?.name || selectedAddress?.name || 'Customer',
+                                contact: user?.phone || selectedAddress?.phone || ''
+                            },
+                            theme: { color: '#d10f4a' },
+                            handler: async function (response) {
+                                try {
+                                    const verifyRes = await fetch(`${API_URL}/payments/verify`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            razorpay_order_id: response.razorpay_order_id,
+                                            razorpay_payment_id: response.razorpay_payment_id,
+                                            razorpay_signature: response.razorpay_signature,
+                                            orderId
+                                        })
+                                    });
+                                    const verifyData = await verifyRes.json();
+                                    if (verifyData.success) {
+                                        resolve({ success: true, response });
+                                    } else {
+                                        resolve({ success: false, message: verifyData.message || 'Payment verification failed' });
+                                    }
+                                } catch (error) {
+                                    resolve({ success: false, message: 'Verification error' });
+                                }
+                            },
+                            modal: {
+                                ondismiss: function () {
+                                    resolve({ success: false, message: 'Payment cancelled by user' });
+                                }
+                            }
+                        };
+                        const rzp = new window.Razorpay(options);
+                        rzp.on('payment.failed', function (response) {
+                            resolve({
+                                success: false,
+                                message: response?.error?.description || 'Payment failed'
+                            });
+                        });
+                        rzp.open();
+                    });
+
+                    if (!paymentResult.success) {
+                        showNotification(paymentResult.message || 'Payment failed');
+                        return;
+                    }
+
+                    finalStatus = 'Paid';
+                    paymentMeta = {
+                        razorpayPaymentId: paymentResult.response.razorpay_payment_id,
+                        razorpayOrderId: paymentResult.response.razorpay_order_id
+                    };
+                }
+
+                const order = {
+                    orderId,
+                    createdAt: new Date().toISOString(),
+                    customerName: user?.name || selectedAddress?.name || 'Guest Customer',
+                    phone: user?.phone || selectedAddress?.phone || 'Unknown',
+                    address: selectedAddress ? `${selectedAddress.houseNo}, ${selectedAddress.address}, ${selectedAddress.pincode}` : 'No address saved',
+                    totalPrice: totals.amountToPay,
+                    quantity,
+                    paymentMethod: paymentMethod.value,
+                    status: finalStatus,
+                    ...paymentMeta,
+                    items: cart.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        quantity: item.quantity,
+                        price: item.price,
+                        total: item.price * item.quantity,
+                        image: item.image
+                    }))
+                };
+
+                const orders = JSON.parse(localStorage.getItem('pureDesiOrders') || '[]');
+                orders.unshift(order);
+                localStorage.setItem('pureDesiOrders', JSON.stringify(orders));
+
+                cart = [];
+                saveCart();
+
+                const paymentText = paymentMethod.value === 'cod' ? 'Cash on Delivery' : paymentMethod.value.toUpperCase();
+                alert(`🎉 Order placed successfully!\nOrder ID: ${orderId}\nTotal: ₹${totals.amountToPay}\nPayment: ${paymentText}\nThank you for choosing Pure Desi Country Chicken!`);
+                document.getElementById('paymentPage').style.display = 'none';
+                window.location.href = 'orders.html';
+            } catch (error) {
+                console.error('Order placement failed:', error);
+                showNotification('Could not place order. Please try again.');
+            }
+        }
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existing = cart.find(item => item.id === productId);
+            if (existing) existing.quantity++;
+            else cart.push({ id: product.id, name: product.name, price: product.price, originalPrice: product.originalPrice || product.price, quantity: 1, image: product.image });
+            saveCart(); renderSliders(); showCartNotification();
+        }
+        function showCartNotification() {
+            const notif = document.createElement('div');
+            notif.className = 'cart-notification';
+            notif.innerHTML = `
+                <div class="cart-notif-content">
+                    <span>✓ Item added to cart!</span>
+                    <button onclick="viewCart()" class="view-cart-btn">View Cart</button>
+                </div>
+            `;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
+        }
+
+        function renderSliders() {
+            // Get active category
+            const activeCategory = document.querySelector('.category-item.active');
+            const category = activeCategory ? activeCategory.onclick.toString().match(/filterByCategory\('([^']+)'\)/)?.[1] : 'all';
+            
+            // Filter products based on category
+            let filteredProducts = products;
+            if (category && category !== 'all') {
+                filteredProducts = products.filter(p => p.category === category);
+            }
+            
+            const hitProducts = filteredProducts.filter(p => p.isHit);
+            const otherProducts = filteredProducts.filter(p => !p.isHit);
+            
+            const sliderHTML = (productList) => productList.map(product => {
+                const cartItem = cart.find(i => i.id === product.id);
+                const quantity = cartItem ? cartItem.quantity : 0;
+                return `<div class="slider-product-card">
+                    <img src="${product.image}" class="slider-product-image" onerror="this.src='https://placehold.co/200x200/2d6a2d/white?text=🍗'">
+                    <div class="slider-product-title">${product.name}</div>
+                    <div class="slider-product-meta">${product.weight}</div>
+                    <div class="slider-price-row"><span class="slider-current-price">₹${product.price}</span><span class="slider-original-price">₹${product.originalPrice}</span><span class="slider-discount">${product.discount}% off</span></div>
+                    <div class="delivery-badge"><i class="far fa-clock"></i> ${product.delivery}</div>
+                    ${quantity > 0 ? `<div class="slider-quantity-controls"><button class="slider-quantity-btn" onclick="updateCartQuantity(${product.id}, -1)">-</button><span>${quantity}</span><button class="slider-quantity-btn" onclick="updateCartQuantity(${product.id}, 1)">+</button></div>` : `<button class="slider-add-btn" onclick="addToCart(${product.id})">Add to Cart</button>`}
+                </div>`;
+            }).join('');
+            
+            document.getElementById('sliderProducts').innerHTML = sliderHTML(hitProducts);
+            document.getElementById('quickBitesSlider').innerHTML = sliderHTML(otherProducts);
+        }
+
+        function filterProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = products.filter(p => p.name.toLowerCase().includes(searchTerm));
+            
+            // Apply category filter if not 'all'
+            const activeCategory = document.querySelector('.category-item.active');
+            const category = activeCategory ? activeCategory.onclick.toString().match(/filterByCategory\('([^']+)'\)/)?.[1] : 'all';
+            if (category && category !== 'all') {
+                filtered = filtered.filter(p => p.category === category);
+            }
+            
+            const resultsDiv = document.getElementById('searchResults');
+            if (filtered.length === 0) resultsDiv.innerHTML = `<div class="no-results"><i class="fas fa-search"></i><p>No products found</p></div>`;
+            else {
+                resultsDiv.innerHTML = `<div class="products-grid">${filtered.map(product => {
+                    const cartItem = cart.find(i => i.id === product.id);
+                    const quantity = cartItem ? cartItem.quantity : 0;
+                    return `<div class="product-card"><img src="${product.image}" class="product-image"><div class="product-info"><div class="product-title">${product.name}</div><div class="product-meta">${product.weight}</div><div class="price-row"><span class="current-price">₹${product.price}</span><span class="original-price">₹${product.originalPrice}</span><span class="discount">${product.discount}% off</span></div>${quantity > 0 ? `<div class="quantity-controls"><button class="quantity-btn" onclick="updateCartQuantity(${product.id}, -1)">-</button><span>${quantity}</span><button class="quantity-btn" onclick="updateCartQuantity(${product.id}, 1)">+</button></div>` : `<button class="add-btn" onclick="addToCart(${product.id})">Add to Cart</button>`}</div></div>`;
+                }).join('')}</div>`;
+            }
+        }
+
+        function filterByCategory(category, evt) {
+            // Update active category styling
+            document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+            const clickedItem = evt?.currentTarget || evt?.target?.closest('.category-item');
+            if (clickedItem && clickedItem.classList.contains('category-item')) {
+                clickedItem.classList.add('active');
+            }
+            
+            // Filter products and update display
+            filterProducts();
+            renderSliders();
+            
+            // If on search page, update search results
+            if (document.getElementById('searchContent').style.display !== 'none') {
+                filterProducts();
+            }
+        }
+
+        function clearSearch() { document.getElementById('searchInput').value = ''; filterProducts(); }
+        function showHome() { document.getElementById('homeContent').style.display = 'block'; document.getElementById('searchContent').style.display = 'none'; document.getElementById('aboutContent').style.display = 'none'; document.getElementById('categoriesContent').style.display = 'none'; document.querySelectorAll('.bottom-nav .nav-item').forEach(i => i.classList.remove('active')); document.getElementById('navHome').classList.add('active'); renderSliders(); }
+        function showCategories() { document.getElementById('homeContent').style.display = 'none'; document.getElementById('searchContent').style.display = 'none'; document.getElementById('aboutContent').style.display = 'none'; document.getElementById('categoriesContent').style.display = 'block'; document.querySelectorAll('.bottom-nav .nav-item').forEach(i => i.classList.remove('active')); document.getElementById('navCategories').classList.add('active'); }
+        function showSearch() { document.getElementById('homeContent').style.display = 'none'; document.getElementById('searchContent').style.display = 'block'; document.getElementById('aboutContent').style.display = 'none'; document.getElementById('categoriesContent').style.display = 'none'; document.querySelectorAll('.bottom-nav .nav-item').forEach(i => i.classList.remove('active')); document.getElementById('navSearch').classList.add('active'); filterProducts(); }
+        function showAbout() { document.getElementById('homeContent').style.display = 'none'; document.getElementById('searchContent').style.display = 'none'; document.getElementById('aboutContent').style.display = 'block'; document.getElementById('categoriesContent').style.display = 'none'; closeProfile(); }
+        function showAllProducts() { showNotification('All products coming soon!'); }
+        function openCart() { document.getElementById('cartSidebar').classList.add('open'); document.getElementById('overlay').classList.add('show'); updateCartUI(); }
+        function closeCart() { document.getElementById('cartSidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+        
+        function isUserLoggedIn() {
+            const user = localStorage.getItem('pureDesiUser');
+            const token = localStorage.getItem('pureDesiToken');
+            return user && token;
+        }
+        
+        function openProfile() {
+            if (!isUserLoggedIn()) {
+                closeProfile();
+                document.querySelectorAll('.bottom-nav .nav-item').forEach(i => i.classList.remove('active'));
+                showNotification('Please login to access your account');
+                setTimeout(() => openOTPModal(), 500);
+                return;
+            }
+            
+            document.getElementById('profileSidebar').classList.add('open');
+            document.getElementById('profileOverlay').classList.add('show');
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('navAccount').classList.add('active');
+        }
+        function closeProfile() {
+            document.getElementById('profileSidebar').classList.remove('open');
+            document.getElementById('profileOverlay').classList.remove('show');
+        }
+        
+        function navigateToOrders() {
+            if (!isUserLoggedIn()) {
+                closeProfile();
+                showNotification('Please login to view your orders');
+                setTimeout(() => openOTPModal(), 500);
+                return;
+            }
+            window.location.href = 'orders.html';
+        }
+        
+        function navigateToAddresses() {
+            if (!isUserLoggedIn()) {
+                closeProfile();
+                showNotification('Please login to manage your addresses');
+                setTimeout(() => openOTPModal(), 500);
+                return;
+            }
+            window.location.href = 'addresses.html';
+        }
+        function logout() {
+            if (typeof window.performLogout === 'function') {
+                window.performLogout();
+            } else {
+                showNotification('Logged out successfully!');
+                closeProfile();
+            }
+        }
+
+        function checkout() {
+            if (cart.length === 0) { showNotification('Your cart is empty!'); return; }
+            
+            if (!isUserLoggedIn()) {
+                showNotification('Please login to place an order');
+                setTimeout(() => openOTPModal(), 500);
+                return;
+            }
+
+            const total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+            const quantity = cart.reduce((sum, i) => sum + i.quantity, 0);
+            const storedUser = localStorage.getItem('pureDesiUser');
+            const user = storedUser ? JSON.parse(storedUser) : null;
+            const orderId = 'ORD' + Date.now();
+            const order = {
+                orderId,
+                createdAt: new Date().toISOString(),
+                customerName: user?.name || 'Guest Customer',
+                phone: user?.phone || 'Unknown',
+                address: user?.address || 'No address saved',
+                totalPrice: total,
+                quantity,
+                status: 'Pending',
+                items: cart.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    quantity: item.quantity,
+                    price: item.price,
+                    total: item.price * item.quantity
+                }))
+            };
+
+            const orders = JSON.parse(localStorage.getItem('pureDesiOrders') || '[]');
+            orders.unshift(order);
+            localStorage.setItem('pureDesiOrders', JSON.stringify(orders));
+
+            alert(`🎉 Order placed successfully!\nOrder ID: ${orderId}\nTotal: ₹${total}\nThank you for choosing Pure Desi Country Chicken!`);
+            cart = [];
+            saveCart();
+            renderSliders();
+            closeCart();
+            window.location.href = 'orders.html';
+        }
+
+        function getStoredOrders() {
+            return JSON.parse(localStorage.getItem('pureDesiOrders') || '[]');
+        }
+
+        function saveStoredOrders(orders) {
+            localStorage.setItem('pureDesiOrders', JSON.stringify(orders));
+        }
+
+        function initGoogleMaps() {
+            restoreSelectedHomeLocation();
+            updateHomeLocationLabel();
+            initializeHomeLocationMap();
+        }
+
+        async function loadGoogleMapsScript() {
+            if (window.google && window.google.maps) {
+                initGoogleMaps();
+                return;
+            }
+            try {
+                const response = await fetch(`${API_URL}/config/maps`);
+                const data = await response.json();
+                const apiKey = data.googleMapsApiKey;
+                if (!apiKey) {
+                    console.warn('Google Maps API key missing');
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGoogleMaps`;
+                script.async = true;
+                script.defer = true;
+                document.body.appendChild(script);
+            } catch (error) {
+                console.error('Failed to load Google Maps script:', error);
+            }
+        }
+
+        async function loadPaymentConfig() {
+            try {
+                const response = await fetch(`${API_URL}/config/payment`);
+                const data = await response.json();
+                razorpayPublicKey = data.razorpayKeyId || '';
+            } catch (error) {
+                console.error('Failed to load payment config:', error);
+            }
+        }
+
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
+            input.addEventListener('change', updatePaymentMethodUI);
+        });
+        updatePaymentMethodUI();
+        restoreSelectedHomeLocation();
+        updateHomeLocationLabel();
+        loadGoogleMapsScript();
+        loadPaymentConfig();
+
+        startTimer();
+        renderSliders();
+        if (new URLSearchParams(window.location.search).get('from') === 'cart') {
+            viewCart();
+            const url = new URL(window.location.href);
+            url.searchParams.delete('from');
+            window.history.replaceState({}, '', url.toString());
+        }
+        window.addToCart = addToCart; window.updateCartQuantity = updateCartQuantity; window.removeFromCart = removeFromCart;
+        window.openCart = openCart; window.closeCart = closeCart; window.viewCart = viewCart; window.checkout = checkout;
+        window.showHome = showHome; window.showCategories = showCategories; window.showSearch = showSearch;
+        window.showAbout = showAbout; window.showAllProducts = showAllProducts;
+        window.openProfile = openProfile; window.closeProfile = closeProfile;
+        window.filterProducts = filterProducts; window.clearSearch = clearSearch; window.logout = logout;
+        window.filterByCategory = filterByCategory; window.showNotification = showNotification;
+        window.openHealthPopup = openHealthPopup; window.closeHealthPopup = closeHealthPopup;
+        window.orderNowFromPopup = orderNowFromPopup; window.maybeShowHealthPopupAfterLogin = maybeShowHealthPopupAfterLogin;
+        window.showCartPage = showCartPage; window.closeCartPage = closeCartPage; window.proceedToPayment = proceedToPayment;
+        window.closePaymentPage = closePaymentPage; window.placeOrder = placeOrder;
+        window.selectPaymentMethod = selectPaymentMethod;
+        window.openLocationPicker = openLocationPicker; window.closeLocationPicker = closeLocationPicker;
+        window.applyPickedLocation = applyPickedLocation; window.initGoogleMaps = initGoogleMaps;
+        window.applyCoupon = applyCoupon; window.removeCoupon = removeCoupon;
+        window.openSlotPicker = openSlotPicker; window.closeSlotPicker = closeSlotPicker; window.selectDeliverySlot = selectDeliverySlot;
+        maybeShowHealthPopupAfterLogin();
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('SW registered:', reg.scope))
+                    .catch(err => console.error('SW error:', err));
+            });
+        }
+
+        // Offline / online banner
+        const offlineBanner = document.getElementById('offlineBanner');
+        function updateOnlineStatus() {
+            if (!navigator.onLine) {
+                offlineBanner.classList.add('show');
+            } else {
+                offlineBanner.classList.remove('show');
+            }
+        }
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus();
+    </script>
+</body>
+</html>
